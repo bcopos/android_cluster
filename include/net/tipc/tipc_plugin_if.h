@@ -1,8 +1,8 @@
 /*
- * include/net/tipc/tipc_bearer.h: Include file for privileged access to TIPC bearers
+ * include/net/tipc/tipc_plugin_if.h: Include file for interface access by TIPC plugins
  * 
  * Copyright (c) 2003-2006, Ericsson AB
- * Copyright (c) 2005, Wind River Systems
+ * Copyright (c) 2005-2006, Wind River Systems
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,38 +43,26 @@
 #include <linux/skbuff.h>
 #include <linux/spinlock.h>
 
+#define TIPC_MAX_BEARERS	8
+
 /*
  * Identifiers of supported TIPC media types
  */
 
-#define TIPC_MEDIA_TYPE_ETH	1
+#define TIPC_MEDIA_ID_INVALID	0
+#define TIPC_MEDIA_ID_ETH	1
 
-/* 
- * Destination address structure used by TIPC bearers when sending messages
- * 
- * IMPORTANT: The fields of this structure MUST be stored using the specified
- * byte order indicated below, as the structure is exchanged between nodes
- * as part of a link setup process.
+/**
+ * struct tipc_media_addr - destination address used by TIPC bearers
+ * @value: media-specific address info (opaque to TIPC) 
+ * @media_id: TIPC media identifier
+ * @broadcast: non-zero if address is a broadcast address
  */
 
 struct tipc_media_addr {
-	__be32  type;			/* bearer type (network byte order) */
-	union {
-		__u8   eth_addr[6];	/* 48 bit Ethernet addr (byte array) */ 
-#if 0
-		/* Prototypes for other possible bearer types */
-
-		struct {
-			__u16 sin_family;
-			__u16 sin_port;
-			struct {
-				__u32 s_addr;
-			} sin_addr;
-			char pad[4];
-		} addr_in;		/* IP-based bearer */
-		__u16  sock_descr;	/* generic socket bearer */
-#endif
-	} dev_addr;
+        u8 value[20];
+	u8 media_id;
+        u8 broadcast;
 };
 
 /**
@@ -82,48 +70,70 @@ struct tipc_media_addr {
  * @usr_handle: pointer to additional user-defined information about bearer
  * @mtu: max packet size bearer can support
  * @blocked: non-zero if bearer is blocked
- * @lock: spinlock for controlling access to bearer
  * @addr: media-specific address associated with bearer
  * @name: bearer name (format = media:interface)
+ * @lock: spinlock for controlling access to bearer
  * 
  * Note: TIPC initializes "name" and "lock" fields; user is responsible for
  * initialization all other fields when a bearer is enabled.
  */
 
+
 struct tipc_bearer {
 	void *usr_handle;
 	u32 mtu;
 	int blocked;
-	spinlock_t lock;
 	struct tipc_media_addr addr;
 	char name[TIPC_MAX_BEARER_NAME];
+	spinlock_t lock;
+};
+
+/**
+ * struct tipc_media - TIPC media information available to privileged users
+ * @type_id: TIPC media identifier
+ * @name: media name
+ * @priority: default link (and bearer) priority
+ * @tolerance: default time (in ms) before declaring link failure
+ * @window: default window (in packets) before declaring link congestion
+ * @send_msg: routine which handles buffer transmission
+ * @enable_bearer: routine which enables a bearer
+ * @disable_bearer: routine which disables a bearer
+ * @addr2str: routine which converts media address to string form
+ * @str2addr: routine which converts media address from string form
+ * @msg2addr: routine which converts media address to message header form
+ * @addr2msg: routine which converts media address from message header form
+ * @bcast_addr: media address used in broadcasting
+ */
+ 
+struct tipc_media {
+	u8 media_id;
+	char name[TIPC_MAX_MEDIA_NAME];
+	u32 priority;
+	u32 tolerance;
+	u32 window;
+	int (*send_msg)(struct sk_buff *buf, 
+			struct tipc_bearer *b_ptr,
+			struct tipc_media_addr *dest);
+	int (*enable_bearer)(struct tipc_bearer *b_ptr);
+	void (*disable_bearer)(struct tipc_bearer *b_ptr);
+	int (*addr2str)(struct tipc_media_addr *a, char *str_buf, int str_size);
+	int (*str2addr)(struct tipc_media_addr *a, char *str_buf);
+        int (*msg2addr)(struct tipc_media_addr *a, u32 *msg_area);
+        int (*addr2msg)(struct tipc_media_addr *a, u32 *msg_area);
+	struct tipc_media_addr bcast_addr;
 };
 
 /*
  * TIPC routines available to supported media types
  */
 
-int  tipc_register_media(u32 media_type,
-			 char *media_name, 
-			 int (*enable)(struct tipc_bearer *), 
-			 void (*disable)(struct tipc_bearer *), 
-			 int (*send_msg)(struct sk_buff *, 
-					 struct tipc_bearer *,
-					 struct tipc_media_addr *), 
-			 char *(*addr2str)(struct tipc_media_addr *a,
-					   char *str_buf,
-					   int str_size),
-			 struct tipc_media_addr *bcast_addr,
-			 const u32 bearer_priority,
-			 const u32 link_tolerance,  /* [ms] */
-			 const u32 send_window_limit); 
-
+int  tipc_register_media(struct tipc_media *m_ptr);
 void tipc_recv_msg(struct sk_buff *buf, struct tipc_bearer *tb_ptr);
 
 int  tipc_block_bearer(const char *name);
 void tipc_continue(struct tipc_bearer *tb_ptr); 
 
-int tipc_enable_bearer(const char *bearer_name, u32 bcast_scope, u32 priority);
+int tipc_enable_bearer(const char *bearer_name, u32 disc_domain, u32 priority);
 int tipc_disable_bearer(const char *name);
 
 /*

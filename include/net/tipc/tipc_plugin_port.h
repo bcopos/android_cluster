@@ -1,8 +1,8 @@
 /*
- * include/net/tipc/tipc_port.h: Include file for privileged access to TIPC ports
+ * include/net/tipc/tipc_port.h: Include file for port access by TIPC plugins
  * 
  * Copyright (c) 1994-2007, Ericsson AB
- * Copyright (c) 2005-2008, Wind River Systems
+ * Copyright (c) 2005-2007, Wind River Systems
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@
 
 #include <linux/tipc.h>
 #include <linux/skbuff.h>
-#include <net/tipc/tipc_msg.h>
+#include <net/tipc/tipc_plugin_msg.h>
 
 #define TIPC_FLOW_CONTROL_WIN 512
 
@@ -75,16 +75,23 @@ struct tipc_port {
 };
 
 
+#ifdef CONFIG_KRGRPC
+struct tipc_port *tipc_createport_raw(void *usr_handle,
+			u32 (*dispatcher)(struct tipc_port *, struct sk_buff *),
+			void (*wakeup)(struct tipc_port *),
+			const u32 importance, void* user_port);
+#else
 struct tipc_port *tipc_createport_raw(void *usr_handle,
 			u32 (*dispatcher)(struct tipc_port *, struct sk_buff *),
 			void (*wakeup)(struct tipc_port *),
 			const u32 importance);
+#endif
 
 int tipc_reject_msg(struct sk_buff *buf, u32 err);
 
 int tipc_send_buf_fast(struct sk_buff *buf, u32 destnode);
 
-void tipc_acknowledge(u32 port_ref,u32 ack);
+void tipc_acknowledge(u32 port_ref, u32 ack);
 
 struct tipc_port *tipc_get_port(const u32 ref);
 
@@ -95,7 +102,6 @@ void *tipc_get_handle(const u32 ref);
  */
 
 int tipc_disconnect_port(struct tipc_port *tp_ptr);
-
 
 #endif
 

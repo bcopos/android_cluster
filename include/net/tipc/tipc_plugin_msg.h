@@ -1,8 +1,8 @@
 /*
- * include/net/tipc/tipc_msg.h: Include file for privileged access to TIPC message headers
+ * include/net/tipc/tipc_msg.h: Include file for message access by TIPC plugins
  * 
  * Copyright (c) 2003-2006, Ericsson AB
- * Copyright (c) 2005, Wind River Systems
+ * Copyright (c) 2005-2007, Wind River Systems
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,45 +39,18 @@
 
 #ifdef __KERNEL__
 
+/*
+ * Public TIPC message header definitions
+ *
+ * The following definitions are available to plugins that supplement TIPC's
+ * standard API and interface code.  (Additional definitions used internally
+ * by TIPC are found in tipc_msg.h.)
+ */
+
 struct tipc_msg {
 	__be32 hdr[15];
 };
 
-
-/*
-		TIPC user data message header format, version 2:
-
-
-       1 0 9 8 7 6 5 4|3 2 1 0 9 8 7 6|5 4 3 2 1 0 9 8|7 6 5 4 3 2 1 0 
-      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   w0:|vers | user  |hdr sz |n|d|s|-|          message size           |
-      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   w1:|mstyp| error |rer cnt|lsc|opt p|      broadcast ack no         |
-      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   w2:|        link level ack no      |   broadcast/link level seq no |
-      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   w3:|                       previous node                           |
-      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   w4:|                      originating port                         |
-      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   w5:|                      destination port                         |
-      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+    
-   w6:|                      originating node                         |
-      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   w7:|                      destination node                         |
-      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   w8:|            name type / transport sequence number              |
-      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   w9:|              name instance/multicast lower bound              |
-      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+    
-   wA:|                    multicast upper bound                      |
-      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+    
-      /                                                               /
-      \                           options                             \
-      /                                                               /
-      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-*/
 
 #define TIPC_CONN_MSG	0
 #define TIPC_MCAST_MSG	1
@@ -128,6 +101,11 @@ static inline unchar *msg_data(struct tipc_msg *m)
 static inline u32 msg_type(struct tipc_msg *m)
 {
 	return msg_bits(m, 1, 29, 0x7);
+}
+
+static inline u32 msg_direct(struct tipc_msg *m)
+{
+	return (msg_type(m) == TIPC_DIRECT_MSG);
 }
 
 static inline u32 msg_named(struct tipc_msg *m)
