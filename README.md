@@ -36,7 +36,8 @@ Failed patches
 * arch
     * arch_x86_configs_i386_defconfig
     * arch_x86_configs_x86_64_defconfig
-    * arch_x86_include_asm_pgtable_types.h
+    * ~~arch_x86_include_asm_pgtable_types.h~~
+        * code for patch was in pgtable.h instead, applied patches there, seems OK
     * ~~arch_x86_include_asm_thread_info.h~~
         * define was missing, seems OK
     * arch_x86_include_asm_uaccess.h
