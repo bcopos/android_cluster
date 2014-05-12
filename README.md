@@ -27,7 +27,8 @@ Failed patches
         * line missing "include <linux/fs_struct.h>", irrelevant to patch... seems OK
     * kernel_cgroup.c
     * kernel_exit.c
-    * kernel_fork.c
+    * ~~kernel_fork.c~~
+        * some "includes" missing
     * kernel_pid.c
     * kernel_ptrace.c
     * kernel_sched.c

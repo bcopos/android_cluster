@@ -61,6 +61,23 @@
 #include <linux/proc_fs.h>
 #include <linux/blkdev.h>
 #include <trace/sched.h>
+#ifdef CONFIG_KRG_KDDM
+#include <kddm/kddm_info.h>
+#endif
+#ifdef CONFIG_KRG_HOTPLUG
+#include <kerrighed/namespace.h>
+#endif
+#ifdef CONFIG_KRG_PROC
+#include <kerrighed/task.h>
+#include <kerrighed/krginit.h>
+#endif
+#ifdef CONFIG_KRG_EPM
+#include <kerrighed/signal.h>
+#include <kerrighed/children.h>
+#include <kerrighed/application.h>
+#endif
+#ifdef CONFIG_KRG_SCHED
+#include <kerrighed/scheduler/info.h>
 
 #include <asm/pgtable.h>
 #include <asm/pgalloc.h>
