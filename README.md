@@ -39,7 +39,8 @@ Failed patches
     * ~~arch_x86_include_asm_thread_info.h~~
         * define was missing, seems OK
     * arch_x86_include_asm_uaccess.h
-    * arch_x86_kernel_cpu_proc.c
+    * ~~arch_x86_kernel_cpu_proc.c~~
+        * different function call for cpu_mask, seems OK
     * arch_x86_kernel_process_32.c
     * arch_x86_kernel_process.c
 * fs

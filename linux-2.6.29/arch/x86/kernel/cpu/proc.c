@@ -56,8 +56,11 @@ static void show_cpuinfo_core(struct seq_file *m, struct cpuinfo_x86 *c,
 #ifdef CONFIG_SMP
 	if (c->x86_max_cores * smp_num_siblings > 1) {
 		seq_printf(m, "physical id\t: %d\n", c->phys_proc_id);
+#ifndef CONFIG_KRG_PROCFS
+		/* TODO: implement support for cpu_core_map */
 		seq_printf(m, "siblings\t: %d\n",
 			   cpus_weight(per_cpu(cpu_core_map, cpu)));
+#endif
 		seq_printf(m, "core id\t\t: %d\n", c->cpu_core_id);
 		seq_printf(m, "cpu cores\t: %d\n", c->booted_cores);
 		seq_printf(m, "apicid\t\t: %d\n", c->apicid);
