@@ -44,7 +44,8 @@ Failed patches
         * different function call for cpu_mask, seems OK
     * ~~arch_x86_kernel_process_32.c~~
         * line after patch (312-ish) is different, REVISIT THIS
-    * arch_x86_kernel_process.c
+    * ~~arch_x86_kernel_process.c~~
+        * code for patch was moved from process_32/64, so I applied patch directly there, seems OK
 * fs
     * ~~fs_binfmt_elf_fdpic.c~~
         * task_pid_vnr(p->real_parent) (30) vs. task_pid_vnr(p->parent) (29)...

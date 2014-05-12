@@ -737,6 +737,18 @@ sys_clone(unsigned long clone_flags, unsigned long newsp,
  */
 asmlinkage long sys_vfork(struct pt_regs *regs)
 {
+#ifdef CONFIG_KRG_EPM
+#ifdef CONFIG_KRG_CAP
+	if (can_use_krg_cap(current, CAP_DISTANT_FORK))
+#endif
+	{
+		int retval = krg_do_fork(CLONE_VFORK | SIGCHLD,
+					 regs->sp, regs, 0,
+					 NULL, NULL, 0);
+		if (retval > 0)
+			return retval;
+	}
+#endif /* CONFIG_KRG_EPM */
 	return do_fork(CLONE_VFORK | CLONE_VM | SIGCHLD, regs->sp, regs, 0,
 		    NULL, NULL);
 }
