@@ -37,6 +37,9 @@
 #include <linux/vfs.h>
 #include <linux/inet.h>
 #include <linux/nfs_xdr.h>
+#ifdef CONFIG_KRG_MM
+#include <kerrighed/krgsyms.h>
+#endif
 
 #include <asm/system.h>
 #include <asm/uaccess.h>
@@ -1405,6 +1408,9 @@ static void __exit exit_nfs_fs(void)
 	unregister_nfs_fs();
 	nfs_fs_proc_exit();
 	nfsiod_stop();
+#ifdef CONFIG_KRG_MM
+	krgsyms_unregister(KRGSYMS_VM_OPS_NFS_FILE);
+#endif
 }
 
 /* Not quite true; I just maintain it */

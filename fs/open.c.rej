@@ -1,0 +1,12 @@
+--- fs/open.c
++++ fs/open.c
+@@ -30,6 +30,9 @@
+ #include <linux/audit.h>
+ #include <linux/falloc.h>
+ #include <linux/fs_struct.h>
++#ifdef CONFIG_KRG_IPC
++#include <kerrighed/faf.h>
++#endif
+ 
+ int vfs_statfs(struct dentry *dentry, struct kstatfs *buf)
+ {

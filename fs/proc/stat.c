@@ -19,7 +19,10 @@
 #define arch_irq_stat() 0
 #endif
 
-static int show_stat(struct seq_file *p, void *v)
+#ifndef CONFIG_KRG_PROCFS
+static
+#endif
+int show_stat(struct seq_file *p, void *v)
 {
 	int i, j;
 	unsigned long jif;

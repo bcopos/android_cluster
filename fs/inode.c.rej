@@ -1,0 +1,12 @@
+--- fs/inode.c
++++ fs/inode.c
+@@ -148,6 +148,9 @@
+ 	inode->i_cdev = NULL;
+ 	inode->i_rdev = 0;
+ 	inode->dirtied_when = 0;
++#ifdef CONFIG_KRG_DVFS
++	inode->i_objid = 0;
++#endif
+ 
+ 	if (security_inode_alloc(inode))
+ 		goto out_free_inode;

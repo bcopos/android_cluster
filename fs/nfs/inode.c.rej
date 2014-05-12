@@ -1,0 +1,26 @@
+--- fs/nfs/inode.c
++++ fs/nfs/inode.c
+@@ -1446,6 +1449,12 @@
+ {
+ 	int err;
+ 
++#ifdef CONFIG_KRG_MM
++	err = krgsyms_register(KRGSYMS_VM_OPS_NFS_FILE, &nfs_file_vm_ops);
++	if (err)
++		goto out8;
++#endif
++
+ 	err = nfs_fscache_register();
+ 	if (err < 0)
+ 		goto out7;
+@@ -1504,6 +1513,10 @@
+ out6:
+ 	nfs_fscache_unregister();
+ out7:
++#ifdef CONFIG_KRG_MM
++	krgsyms_unregister(KRGSYMS_VM_OPS_NFS_FILE);
++out8:
++#endif
+ 	return err;
+ }
+ 
