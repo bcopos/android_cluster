@@ -49,7 +49,8 @@ Failed patches
     * fs_nfs_inode.c
     * fs_open.c
     * fs_proc_base.c
-    * fs_proc_uptime.c
+    * ~~fs_proc_uptime.c~~
+        * uptime_proc_show (30) is the same-ish as uptime_proc_read (29) but function name and params are diff. Patch only changes the function type (from static to not), seems OK
     * ~~fs_stat.c~~
         * function is replaced in 2.6.30, but contents are similar, modified 29 to be similar to 30 and applied patch, seems OK
 * ipc

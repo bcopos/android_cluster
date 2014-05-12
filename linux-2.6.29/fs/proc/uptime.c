@@ -18,7 +18,10 @@ static int proc_calc_metrics(char *page, char **start, off_t off,
 	return len;
 }
 
-static int uptime_read_proc(char *page, char **start, off_t off, int count,
+#ifndef CONFIG_KRG_PROCFS
+static
+#endif
+int uptime_read_proc(char *page, char **start, off_t off, int count,
 			    int *eof, void *data)
 {
 	struct timespec uptime;
