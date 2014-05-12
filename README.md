@@ -42,7 +42,8 @@ Failed patches
     * arch_x86_kernel_process_32.c
     * arch_x86_kernel_process.c
 * fs
-    * fs_binfmt_elf_fdpic.c
+    * ~~fs_binfmt_elf_fdpic.c~~
+        * task_pid_vnr(p->real_parent) (30) vs. task_pid_vnr(p->parent) (29)...
     * ~~fs_eventpoll.c~~
         * OK
     * ~~fs_exec.c~~

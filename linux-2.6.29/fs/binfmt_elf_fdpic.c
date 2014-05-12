@@ -1396,7 +1396,11 @@ static void fill_prstatus(struct elf_prstatus *prstatus,
 	prstatus->pr_sigpend = p->pending.signal.sig[0];
 	prstatus->pr_sighold = p->blocked.sig[0];
 	prstatus->pr_pid = task_pid_vnr(p);
+#ifdef CONFIG_KRG_EPM
+	prstatus->pr_ppid = krg_get_real_parent_pid(p);
+#else
 	prstatus->pr_ppid = task_pid_vnr(p->parent);
+#endif
 	prstatus->pr_pgrp = task_pgrp_vnr(p);
 	prstatus->pr_sid = task_session_vnr(p);
 	if (thread_group_leader(p)) {
@@ -1440,8 +1444,12 @@ static int fill_psinfo(struct elf_prpsinfo *psinfo, struct task_struct *p,
 			psinfo->pr_psargs[i] = ' ';
 	psinfo->pr_psargs[len] = 0;
 
-	psinfo->pr_pid = task_pid_vnr(p);
+ 	psinfo->pr_pid = task_pid_vnr(p);
+#ifdef CONFIG_KRG_EPM
+	psinfo->pr_ppid = krg_get_real_parent_pid(p);
+#else
 	psinfo->pr_ppid = task_pid_vnr(p->parent);
+#endif
 	psinfo->pr_pgrp = task_pgrp_vnr(p);
 	psinfo->pr_sid = task_session_vnr(p);
 
