@@ -172,6 +172,7 @@ endif
 source "net/dccp/Kconfig"
 source "net/sctp/Kconfig"
 source "net/tipc/Kconfig"
+source "net/krgrpc/Kconfig"
 source "net/atm/Kconfig"
 source "net/802/Kconfig"
 source "net/bridge/Kconfig"
