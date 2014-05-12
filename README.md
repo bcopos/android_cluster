@@ -7,7 +7,8 @@ Failed patches
     * ~~include_linux_ipc_namespace_.h~~
         * although 3 statments at the top of the patch are missing from 2.6.29, it seems like the hunk is to remove a blank line... seems OK!
     * ~~include_linux_init_task.h~~
-    * include_linux_magic.h
+    * ~~include_linux_magic.h~~
+        * line missing "#define STACK_END_MAGIC 0x57AC6E9D" but may not be important, seems OK
     * include_linux_sched.h
     * ~~include_linux_tracehook.h~~
 * net
