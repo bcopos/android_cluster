@@ -16,7 +16,8 @@ Failed patches
     * ~~net_tipc_bcast.c~~
     * ~~net_tipc_bcast.h~~
         * for bcast.c/h seems like the patch tried to remove files but minor differences got in the way... might be OK
-    * net_tipc_dbg.c
+    * ~~net_tipc_dbg.c~~
+        * patch tries to remove files but minor differences (line 261, printf) it couldn't... seems OK 
     * net_tipc_node.c
 * mm
     * mm_vmscan.c
