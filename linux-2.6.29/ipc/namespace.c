@@ -52,11 +52,19 @@ static struct ipc_namespace *clone_ipc_ns(struct ipc_namespace *old_ns)
 	if (ns == NULL)
 		return ERR_PTR(-ENOMEM);
 
-	atomic_inc(&nr_ipc_ns);
-
 	sem_init_ns(ns);
 	msg_init_ns(ns);
 	shm_init_ns(ns);
+
+#ifdef CONFIG_KRG_IPC
+	err = krg_init_ipc_ns(ns);
+	if (err) {
+		kfree(ns);
+		return ERR_PTR(err);
+	}
+#endif
+
+	atomic_inc(&nr_ipc_ns);
 
 	/*
 	 * msgmni has already been computed for the new ipc ns.

@@ -51,6 +51,6 @@ Failed patches
     * fs_stat.c
 * ipc
     * ipc_Makefile
-    * ipc_namespace.c
+    * ~~ipc_namespace.c~~
     * ipc_util.h
 * Makefile
