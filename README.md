@@ -46,7 +46,8 @@ Failed patches
     * fs_eventpoll.c
     * fs_exec.c
     * fs_inode.c
-    * fs_nfs_inode.c
+    * ~~fs_nfs_inode.c~~
+        * a conditional statement is missing from 29 but is irrelevant, seems OK
     * ~~fs_open.c~~
         * import missing, seems OK
     * ~~fs_proc_base.c~~

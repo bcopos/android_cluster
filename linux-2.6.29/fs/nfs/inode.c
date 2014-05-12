@@ -1340,6 +1340,12 @@ static int __init init_nfs_fs(void)
 {
 	int err;
 
+#ifdef CONFIG_KRG_MM
+	err = krgsyms_register(KRGSYMS_VM_OPS_NFS_FILE, &nfs_file_vm_ops);
+	if (err)
+		goto out7;
+#endif
+
 	err = nfsiod_start();
 	if (err)
 		goto out6;
@@ -1392,6 +1398,10 @@ out4:
 out5:
 	nfsiod_stop();
 out6:
+#ifdef CONFIG_KRG_MM
+	krgsyms_unregister(KRGSYMS_VM_OPS_NFS_FILE);
+out7:
+#endif
 	return err;
 }
 
