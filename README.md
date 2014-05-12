@@ -47,7 +47,8 @@ Failed patches
     * fs_exec.c
     * fs_inode.c
     * fs_nfs_inode.c
-    * fs_open.c
+    * ~~fs_open.c~~
+        * import missing, seems OK
     * ~~fs_proc_base.c~~
         * import missing, seems OK
     * ~~fs_proc_uptime.c~~

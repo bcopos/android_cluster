@@ -29,6 +29,9 @@
 #include <linux/rcupdate.h>
 #include <linux/audit.h>
 #include <linux/falloc.h>
+#ifdef CONFIG_KRG_IPC
+#include <kerrighed/faf.h>
+#endif
 
 int vfs_statfs(struct dentry *dentry, struct kstatfs *buf)
 {
