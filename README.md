@@ -23,7 +23,8 @@ Failed patches
 * mm
     * mm_vmscan.c
 * kernel
-    * kernel_auditsc.c
+    * ~~kernel_auditsc.c~~
+        * line missing "include <linux/fs_struct.h>", irrelevant to patch... seems OK
     * kernel_cgroup.c
     * kernel_exit.c
     * kernel_fork.c

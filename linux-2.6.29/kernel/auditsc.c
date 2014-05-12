@@ -66,6 +66,10 @@
 #include <linux/syscalls.h>
 #include <linux/inotify.h>
 #include <linux/capability.h>
+#ifdef CONFIG_KRG_EPM
+#include <kerrighed/action.h>
+#include <kerrighed/ghost.h>
+#endif
 
 #include "audit.h"
 
