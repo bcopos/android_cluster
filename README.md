@@ -50,7 +50,8 @@ Failed patches
     * fs_open.c
     * fs_proc_base.c
     * fs_proc_uptime.c
-    * fs_stat.c
+    * ~~fs_stat.c~~
+        * function is replaced in 2.6.30, but contents are similar, modified 29 to be similar to 30 and applied patch, seems OK
 * ipc
     * ipc_Makefile
     * ~~ipc_namespace.c~~

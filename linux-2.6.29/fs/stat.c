@@ -64,10 +64,20 @@ int vfs_stat_fd(int dfd, char __user *name, struct kstat *stat)
 	int error;
 
 	error = user_path_at(dfd, name, LOOKUP_FOLLOW, &path);
-	if (!error) {
-		error = vfs_getattr(path.mnt, path.dentry, stat);
-		path_put(&path);
+	if (error)
+		goto out;
+#ifdef CONFIG_KRG_FAF
+	if ((!path.dentry) && (path.mnt)) {
+		struct file *file = (struct file *)path.mnt;
+		get_file (file);
+		error = krg_faf_fstat(file, stat);
+		fput(file);
+		return error;
 	}
+#endif
+	error = vfs_getattr(path.mnt, path.dentry, stat);
+	path_put(&path);
+out:
 	return error;
 }
 
