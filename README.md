@@ -9,7 +9,8 @@ Failed patches
     * ~~include_linux_init_task.h~~
     * ~~include_linux_magic.h~~
         * line missing "#define STACK_END_MAGIC 0x57AC6E9D" but may not be important, seems OK
-    * include_linux_sched.h
+    * ~~include_linux_sched.h~~
+        * line missing "unsigned in_execve:1" but irrelevant, seems OK
     * ~~include_linux_tracehook.h~~
 * net
     * net_tipc_bcast.c

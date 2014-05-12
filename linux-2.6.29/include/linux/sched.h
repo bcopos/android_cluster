@@ -1193,6 +1193,12 @@ struct task_struct {
 	/* ??? */
 	unsigned int personality;
 	unsigned did_exec:1;
+#ifdef CONFIG_KRG_HOTPLUG
+	unsigned create_krg_ns:1;
+#endif
+#ifdef CONFIG_KRG_EPM
+	unsigned remote_vfork_done:1;
+#endif
 	pid_t pid;
 	pid_t tgid;
 
