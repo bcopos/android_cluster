@@ -174,4 +174,10 @@ config DISABLE_OBSOLETE_CPUMASK_FUNCTIONS
        bool "Disable obsolete cpumask functions" if DEBUG_PER_CPU_MAPS
        depends on EXPERIMENTAL && BROKEN
 
+config MODULE_HOOK
+	bool "Enable module hooks"
+	help
+	  Enable modules to register/unregister hooks at various places.
+	  In-tree users are Kerrighed's scheduler probes.
+
 endmenu

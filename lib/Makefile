@@ -13,6 +13,12 @@ lib-y := ctype.o string.o vsprintf.o cmdline.o \
 	 sha1.o irq_regs.o reciprocal_div.o argv_split.o \
 	 proportions.o prio_heap.o ratelimit.o show_mem.o is_single_threaded.o
 
+ifdef CONFIG_KRGRPC
+lib-y += hashtable.o unique_id.o cluster_barrier.o remote_sleep.o
+endif
+
+lib-$(CONFIG_MODULE_HOOK) += module_hook.o
+
 lib-$(CONFIG_MMU) += ioremap.o
 lib-$(CONFIG_SMP) += cpumask.o
 
