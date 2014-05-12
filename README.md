@@ -52,5 +52,5 @@ Failed patches
 * ipc
     * ipc_Makefile
     * ~~ipc_namespace.c~~
-    * ipc_util.h
+    * ~~ipc_util.h~~
 * Makefile

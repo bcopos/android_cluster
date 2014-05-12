@@ -43,6 +43,9 @@ struct ipc_params {
 		size_t size;	/* for shared memories */
 		int nsems;	/* for semaphores */
 	} u;			/* holds the getnew() specific param */
+#ifdef CONFIG_KRG_IPC
+	int requested_id;
+#endif
 };
 
 #ifdef CONFIG_KRG_IPC
