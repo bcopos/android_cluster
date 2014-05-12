@@ -1,0 +1,64 @@
+--- arch/x86/include/asm/uaccess.h
++++ arch/x86/include/asm/uaccess.h
+@@ -186,6 +186,34 @@
+ 
+ 
+ #ifdef CONFIG_X86_32
++#ifdef CONFIG_KRG_FAF
++
++#define __put_user_asm_u64(x, addr, err, errret)			\
++	asm volatile("1:	movl %%eax,0(%2)\n"			\
++		     "2:	movl %%edx,4(%2)\n"			\
++		     "3:\n"						\
++		     ".section .fixup,\"ax\"\n"				\
++		     "4:	subl $4,%%esp\n"			\
++		     "  movl $8,(%%esp)\n"				\
++		     "	pushl %%edx\n"					\
++		     "	pushl %%eax\n"					\
++		     "	movl %2,%%eax\n"					\
++		     "	call ruaccess_put_user_asm\n"			\
++		     "	testl %%eax,%%eax\n"				\
++		     "	popl %%eax\n"					\
++		     "	popl %%edx\n"					\
++		     "	lea 4(%%esp),%%esp\n"				\
++		     "	jz 3b\n"					\
++		     "5:	movl %3,%0\n"				\
++		     "	jmp 3b\n"					\
++		     ".previous\n"					\
++		     _ASM_EXTABLE(1b, 4b)				\
++		     _ASM_EXTABLE(2b, 5b)				\
++		     : "=r" (err)					\
++		     : "A" (x), "r" (addr), "i" (errret), "0" (err))
++
++#else /* !CONFIG_KRG_FAF */
++
+ #define __put_user_asm_u64(x, addr, err, errret)			\
+ 	asm volatile("1:	movl %%eax,0(%2)\n"			\
+ 		     "2:	movl %%edx,4(%2)\n"			\
+@@ -199,6 +227,8 @@
+ 		     : "=r" (err)					\
+ 		     : "A" (x), "r" (addr), "i" (errret), "0" (err))
+ 
++#endif /* !CONFIG_KRG_FAF */
++
+ #define __put_user_asm_ex_u64(x, addr)					\
+ 	asm volatile("1:	movl %%eax,0(%1)\n"			\
+ 		     "2:	movl %%edx,4(%1)\n"			\
+@@ -416,6 +477,8 @@
+ 		     : "=r" (err), ltype(x)				\
+ 		     : "m" (__m(addr)), "i" (errret), "0" (err))
+ 
++#endif /* !CONFIG_KRG_FAF */
++
+ #define __get_user_size_ex(x, ptr, size)				\
+ do {									\
+ 	__chk_user_ptr(ptr);						\
+@@ -507,6 +598,8 @@
+ 		     : "=r"(err)					\
+ 		     : ltype(x), "m" (__m(addr)), "i" (errret), "0" (err))
+ 
++#endif /* CONFIG_KRG_FAF */
++
+ #define __put_user_asm_ex(x, addr, itype, rtype, ltype)			\
+ 	asm volatile("1:	mov"itype" %"rtype"0,%1\n"		\
+ 		     "2:\n"						\

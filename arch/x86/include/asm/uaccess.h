@@ -338,6 +338,37 @@ do {									\
 	}								\
 } while (0)
 
+#ifdef CONFIG_KRG_FAF
+
+extern int ruaccess_get_user_asm(void);
+
+#define __get_user_asm(x, addr, err, itype, rtype, ltype, errret)	\
+	asm volatile("1:	mov"itype" %2,%"rtype"1\n"		\
+		     "2:\n"						\
+		     ".section .fixup,\"ax\"\n"				\
+		     "3:	sub $16,%%"_ASM_SP"\n"			\
+		     "	push %%"_ASM_AX"\n"				\
+		     "	"_ASM_MOV" %5,16(%%"_ASM_SP")\n"		\
+		     "	lea %2,%%"_ASM_AX"\n"				\
+		     "	call ruaccess_get_user_asm\n"			\
+		     "	testl %%eax,%%eax\n"				\
+		     "	pop %%"_ASM_AX"\n"				\
+		     "	jnz 4f\n"					\
+		     "	mov"itype" (%%"_ASM_SP"),%"rtype"1\n"		\
+		     "	add $16,%%"_ASM_SP"\n"				\
+		     "	jmp 2b\n"					\
+		     "4:	add $16,%%"_ASM_SP"\n"			\
+		     "	mov %3,%0\n"					\
+		     "	xor"itype" %"rtype"1,%"rtype"1\n"		\
+		     "	jmp 2b\n"					\
+		     ".previous\n"					\
+		     _ASM_EXTABLE(1b, 3b)				\
+		     : "=r" (err), ltype (x)				\
+		     : "m" (__m(addr)), "i" (errret), "0" (err),	\
+		       "i" (sizeof(*(addr))))
+
+#else /* !CONFIG_KRG_FAF */
+
 #define __get_user_asm(x, addr, err, itype, rtype, ltype, errret)	\
 	asm volatile("1:	mov"itype" %2,%"rtype"1\n"		\
 		     "2:\n"						\
@@ -375,6 +406,34 @@ struct __large_struct { unsigned long buf[100]; };
  * we do not write to any memory gcc knows about, so there are no
  * aliasing issues.
  */
+#ifdef CONFIG_KRG_FAF
+
+extern int ruaccess_put_user_asm(void);
+
+#define __put_user_asm(x, addr, err, itype, rtype, ltype, errret)	\
+	asm volatile("1:	mov"itype" %"rtype"1,%2\n"		\
+		     "2:\n"						\
+		     ".section .fixup,\"ax\"\n"				\
+		     "3:	push %%"_ASM_AX"\n"			\
+		     "	sub $16,%%"_ASM_SP"\n"				\
+		     "	mov"itype" %"rtype"1,(%%"_ASM_SP")\n"		\
+		     "	"_ASM_MOV" %5,8(%%"_ASM_SP")\n"			\
+		     "	lea %2,%%"_ASM_AX"\n"				\
+		     "	call ruaccess_put_user_asm\n"			\
+		     "	add $16,%%"_ASM_SP"\n"				\
+		     "	testl %%eax,%%eax\n"				\
+		     "	pop %%"_ASM_AX"\n"				\
+		     "	jz 2b\n"					\
+		     "	mov %3,%0\n"					\
+		     "	jmp 2b\n"					\
+		     ".previous\n"					\
+		     _ASM_EXTABLE(1b, 3b)				\
+		     : "=r"(err)					\
+		     : ltype(x), "m" (__m(addr)), "i" (errret), "0" (err), \
+		       "i" (sizeof(*(addr))))
+
+#else /* CONFIG_KRG_FAF */
+
 #define __put_user_asm(x, addr, err, itype, rtype, ltype, errret)	\
 	asm volatile("1:	mov"itype" %"rtype"1,%2\n"		\
 		     "2:\n"						\
@@ -442,6 +501,18 @@ extern struct movsl_mask {
 	int mask;
 } ____cacheline_aligned_in_smp movsl_mask;
 #endif
+
+#ifdef CONFIG_KRG_FAF
+static inline int check_ruaccess(void)
+{
+	struct thread_info *ti = current_thread_info();
+	return (unlikely(test_ti_thread_flag(ti, TIF_RUACCESS))
+		&& segment_eq(ti->addr_limit, USER_DS));
+}
+
+#define ARCH_HAS_RUACCESS
+#define ARCH_HAS_RUACCESS_FIXUP
+#endif /* CONFIG_KRG_FAF */
 
 #define ARCH_HAS_NOCACHE_UACCESS 1
 

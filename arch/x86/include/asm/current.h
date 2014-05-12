@@ -34,6 +34,14 @@ static __always_inline struct task_struct *get_current(void)
 
 #endif /* X86_32 */
 
+#ifdef CONFIG_KRG_EPM
+#define krg_current (get_current()->effective_current)
+#define current ({							\
+	struct task_struct *__cur = get_current();			\
+	__cur->effective_current ? __cur->effective_current : __cur;	\
+})
+#else /* !CONFIG_KRG_EPM */
 #define current get_current()
+#endif /* !CONFIG_KRG_EPM */
 
 #endif /* _ASM_X86_CURRENT_H */

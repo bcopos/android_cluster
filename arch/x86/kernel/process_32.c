@@ -297,6 +297,10 @@ int copy_thread(int nr, unsigned long clone_flags, unsigned long sp,
 
 	childregs = task_pt_regs(p);
 	*childregs = *regs;
+#ifdef CONFIG_KRG_EPM
+	/* Do not corrupt ax in migration/restart */
+	if (!krg_current || in_krg_do_fork())
+#endif
 	childregs->ax = 0;
 	childregs->sp = sp;
 
@@ -334,8 +338,15 @@ int copy_thread(int nr, unsigned long clone_flags, unsigned long sp,
 
 	ds_copy_thread(p, current);
 
+#ifdef CONFIG_KRG_EPM
+	/* Do not corrupt debugctlmsr in migration/restart */
+	if (!krg_current || in_krg_do_fork()) {
+#endif
 	clear_tsk_thread_flag(p, TIF_DEBUGCTLMSR);
 	p->thread.debugctlmsr = 0;
+#ifdef CONFIG_KRG_EPM
+	}
+#endif
 
 	return err;
 }

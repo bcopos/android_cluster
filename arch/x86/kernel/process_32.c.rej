@@ -1,0 +1,12 @@
+--- arch/x86/kernel/process_32.c
++++ arch/x86/kernel/process_32.c
+@@ -267,6 +271,9 @@
+ 
+ 	p->thread.ip = (unsigned long) ret_from_fork;
+ 
++#ifdef CONFIG_KRG_EPM
++	if (!krg_current)
++#endif
+ 	task_user_gs(p) = get_user_gs(regs);
+ 
+ 	tsk = current;

@@ -86,6 +86,10 @@ static int show_cpuinfo(struct seq_file *m, void *v)
 #ifdef CONFIG_SMP
 	cpu = c->cpu_index;
 #endif
+#ifdef CONFIG_KRG_PROCFS
+	if (m->op != &cpuinfo_op)
+		cpu = c->krg_cpu_id;
+#endif
 	seq_printf(m, "processor\t: %u\n"
 		   "vendor_id\t: %s\n"
 		   "cpu family\t: %d\n"
@@ -103,10 +107,15 @@ static int show_cpuinfo(struct seq_file *m, void *v)
 		seq_printf(m, "stepping\t: unknown\n");
 
 	if (cpu_has(c, X86_FEATURE_TSC)) {
+#ifdef CONFIG_KRG_PROCFS
+		/* TODO: implement support for cpufreq */
+		unsigned int freq = ((m->op == &cpuinfo_op) ? cpu_khz : c->cpu_khz);
+#else
 		unsigned int freq = cpufreq_quick_get(cpu);
 
 		if (!freq)
 			freq = cpu_khz;
+#endif
 		seq_printf(m, "cpu MHz\t\t: %u.%03u\n",
 			   freq / 1000, (freq % 1000));
 	}
