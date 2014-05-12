@@ -44,7 +44,8 @@ Failed patches
 * fs
     * fs_binfmt_elf_fdpic.c
     * fs_eventpoll.c
-    * fs_exec.c
+    * ~~fs_exec.c~~
+	* import missing (hunk1), 2 lines after comment missing in 29 (hunk2), seems OK
     * ~~fs_inode.c~~
         * lines following patch were different, seems OK
     * ~~fs_nfs_inode.c~~

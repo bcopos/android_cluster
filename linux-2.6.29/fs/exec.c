@@ -52,6 +52,16 @@
 #include <linux/tracehook.h>
 #include <linux/kmod.h>
 #include <linux/fsnotify.h>
+#ifdef CONFIG_KRG_CAP
+#include <kerrighed/capabilities.h>
+#endif
+#ifdef CONFIG_KRG_PROC
+#include <kerrighed/task.h>
+#include <kerrighed/krginit.h>
+#endif
+#ifdef CONFIG_KRG_EPM
+#include <kerrighed/signal.h>
+#endif
 
 #include <asm/uaccess.h>
 #include <asm/mmu_context.h>
@@ -1424,8 +1434,16 @@ int do_execve(char * filename,
 	if (retval < 0)
 		goto out;
 
+#ifdef CONFIG_KRG_MM
+	retval = krg_do_execve(current, current->mm);
+	if (retval)
+		goto out;
+#endif
 	/* execve succeeded */
 	mutex_unlock(&current->cred_exec_mutex);
+#ifdef CONFIG_KRG_CAP
+	krg_cap_finish_exec(bprm);
+#endif
 	acct_update_integrals(current);
 	free_bprm(bprm);
 	if (displaced)
