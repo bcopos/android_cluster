@@ -1,0 +1,27 @@
+--- kernel/sched.c
++++ kernel/sched.c
+@@ -5049,7 +5085,14 @@
+ 	unsigned long *switch_count;
+ 	struct rq *rq;
+ 	int cpu;
++#ifdef CONFIG_KRG_EPM
++	struct task_struct *krg_cur;
++#endif
+ 
++#ifdef CONFIG_KRG_EPM
++	krg_cur = krg_current;
++	krg_current = NULL;
++#endif
+ 	cpu = smp_processor_id();
+ 	rq = cpu_rq(cpu);
+ 	rcu_qsctr_inc(cpu);
+@@ -5113,6 +5163,9 @@
+ 
+ 	if (unlikely(reacquire_kernel_lock(current) < 0))
+ 		goto need_resched_nonpreemptible;
++#ifdef CONFIG_KRG_EPM
++	krg_current = krg_cur;
++#endif
+ }
+ 
+ asmlinkage void __sched schedule(void)

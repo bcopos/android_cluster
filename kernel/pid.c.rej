@@ -1,0 +1,11 @@
+--- kernel/pid.c
++++ kernel/pid.c
+@@ -572,7 +685,7 @@
+ 
+ 	rcu_read_lock();
+ 	if (!ns)
+-		ns = current->nsproxy->pid_ns;
++		ns = task_active_pid_ns(current);
+ 	if (likely(pid_alive(task))) {
+ 		if (type != PIDTYPE_PID)
+ 			task = task->group_leader;

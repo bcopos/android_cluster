@@ -79,6 +79,9 @@ void __ptrace_unlink(struct task_struct *child)
 {
 	BUG_ON(!child->ptrace);
 
+#ifdef CONFIG_KRG_EPM
+	krg_ptrace_unlink(child);
+#endif
 	child->ptrace = 0;
 	child->parent = child->real_parent;
 	list_del_init(&child->ptrace_entry);
@@ -174,6 +177,10 @@ bool ptrace_may_access(struct task_struct *task, unsigned int mode)
 
 int ptrace_attach(struct task_struct *task)
 {
+#ifdef CONFIG_KRG_EPM
+	struct children_kddm_object *parent_children_obj;
+	pid_t real_parent_tgid;
+#endif
 	int retval;
 	unsigned long flags;
 
@@ -189,6 +196,13 @@ int ptrace_attach(struct task_struct *task)
 	retval = mutex_lock_interruptible(&current->cred_exec_mutex);
 	if (retval  < 0)
 		goto out;
+#ifdef CONFIG_KRG_EPM
+	down_read(&kerrighed_init_sem);
+	parent_children_obj = rcu_dereference(task->parent_children_obj);
+	if (parent_children_obj)
+		parent_children_obj =
+			krg_parent_children_writelock(task, &real_parent_tgid);
+#endif /* CONFIG_KRG_EPM */
 
 	retval = -EPERM;
 repeat:
@@ -218,6 +232,16 @@ repeat:
 	retval = __ptrace_may_access(task, PTRACE_MODE_ATTACH);
 	if (retval)
 		goto bad;
+#ifdef CONFIG_KRG_EPM
+	retval = krg_set_child_ptraced(parent_children_obj, task, 1);
+	if (retval)
+		goto bad;
+	retval = krg_ptrace_link(task, current);
+	if (retval) {
+		krg_set_child_ptraced(parent_children_obj, task, 0);
+		goto bad;
+	}
+#endif /* CONFIG_KRG_EPM */
 
 	/* Go */
 	task->ptrace |= PT_PTRACED;
@@ -254,6 +278,13 @@ int ptrace_detach(struct task_struct *child, unsigned int data)
 	ptrace_disable(child);
 	clear_tsk_thread_flag(child, TIF_SYSCALL_TRACE);
 
+#ifdef CONFIG_KRG_EPM
+	down_read(&kerrighed_init_sem);
+	parent_children_obj = rcu_dereference(child->parent_children_obj);
+	if (parent_children_obj)
+		parent_children_obj =
+			krg_parent_children_writelock(child, &real_parent_tgid);
+#endif /* CONFIG_KRG_EPM */
 	write_lock_irq(&tasklist_lock);
 	/* protect against de_thread()->release_task() */
 	if (child->ptrace)
@@ -508,8 +539,19 @@ int ptrace_request(struct task_struct *child, long request,
  */
 int ptrace_traceme(void)
 {
+#ifdef CONFIG_KRG_EPM
+	struct children_kddm_object *parent_children_obj;
+	pid_t real_parent_tgid;
+#endif /* CONFIG_KRG_EPM */
 	int ret = -EPERM;
 
+#ifdef CONFIG_KRG_EPM
+	down_read(&kerrighed_init_sem);
+	parent_children_obj = rcu_dereference(current->parent_children_obj);
+	if (parent_children_obj)
+		parent_children_obj =
+			krg_parent_children_writelock(current, &real_parent_tgid);
+#endif /* CONFIG_KRG_EPM */
 	/*
 	 * Are we already being traced?
 	 */
@@ -528,7 +570,23 @@ repeat:
 			goto repeat;
 		}
 
+#ifdef CONFIG_KRG_EPM
+		if (current->parent == baby_sitter)
+			ret = -EPERM;
+		else
+#endif
 		ret = security_ptrace_traceme(current->parent);
+#ifdef CONFIG_KRG_EPM
+		if (!ret)
+			ret = krg_set_child_ptraced(parent_children_obj,
+						    current, 1);
+		if (!ret) {
+			ret = krg_ptrace_link(current, current->parent);
+			if (ret)
+				krg_set_child_ptraced(parent_children_obj,
+						      current, 0);
+		}
+#endif /* CONFIG_KRG_EPM */
 
 		/*
 		 * Set the ptrace bit in the process ptrace flags.
@@ -538,10 +596,26 @@ repeat:
 			current->ptrace |= PT_PTRACED;
 			__ptrace_link(current, current->real_parent);
 		}
+#ifdef CONFIG_KRG_EPM
+		else if (!ret) {
+			/*
+			 * Since tracer should have been real_parent, it's ok
+			 * to call krg_ptrace_unlink() without having called
+			 * __ptrace_link() before.
+			 */
+			krg_ptrace_unlink(current);
+			krg_set_child_ptraced(parent_children_obj, current, 0);
+		}
+#endif /* CONFIG_KRG_EPM */
 
 		write_unlock_irqrestore(&tasklist_lock, flags);
 	}
 	task_unlock(current);
+#ifdef CONFIG_KRG_EPM
+	if (parent_children_obj)
+		krg_children_unlock(parent_children_obj);
+	up_read(&kerrighed_init_sem);
+#endif /* CONFIG_KRG_EPM */
 	return ret;
 }
 

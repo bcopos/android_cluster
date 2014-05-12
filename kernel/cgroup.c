@@ -46,6 +46,10 @@
 #include <linux/cgroupstats.h>
 #include <linux/hash.h>
 #include <linux/namei.h>
+#ifdef CONFIG_KRG_EPM
+#include <kerrighed/ghost.h>
+#include <kerrighed/action.h>
+#endif
 
 #include <asm/atomic.h>
 

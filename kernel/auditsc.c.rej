@@ -1,0 +1,13 @@
+--- kernel/auditsc.c
++++ kernel/auditsc.c
+@@ -67,6 +67,10 @@
+ #include <linux/inotify.h>
+ #include <linux/capability.h>
+ #include <linux/fs_struct.h>
++#ifdef CONFIG_KRG_EPM
++#include <kerrighed/action.h>
++#include <kerrighed/ghost.h>
++#endif
+ 
+ #include "audit.h"
+ 
