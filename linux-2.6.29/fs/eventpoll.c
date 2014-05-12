@@ -396,6 +396,10 @@ static void ep_unregister_pollwait(struct eventpoll *ep, struct epitem *epi)
 			list_del_init(&pwq->llink);
 			remove_wait_queue(pwq->whead, &pwq->wait);
 			kmem_cache_free(pwq_cache, pwq);
+#ifdef CONFIG_KRG_FAF
+			if (epi->ffd.file->f_flags & O_FAF_CLT)
+				krg_faf_poll_dequeue(epi->ffd.file);
+#endif
 		}
 	}
 }

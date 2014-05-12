@@ -43,7 +43,8 @@ Failed patches
     * arch_x86_kernel_process.c
 * fs
     * fs_binfmt_elf_fdpic.c
-    * fs_eventpoll.c
+    * ~~fs_eventpoll.c~~
+        * OK
     * ~~fs_exec.c~~
 	* import missing (hunk1), 2 lines after comment missing in 29 (hunk2), seems OK
     * ~~fs_inode.c~~
