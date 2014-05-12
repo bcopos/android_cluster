@@ -1,0 +1,12 @@
+--- ipc/util.h
++++ ipc/util.h
+@@ -67,6 +77,9 @@
+ 		size_t size;	/* for shared memories */
+ 		int nsems;	/* for semaphores */
+ 	} u;			/* holds the getnew() specific param */
++#ifdef CONFIG_KRG_IPC
++	int requested_id;
++#endif
+ };
+ 
+ /*
