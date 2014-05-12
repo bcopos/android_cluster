@@ -48,7 +48,8 @@ Failed patches
     * fs_inode.c
     * fs_nfs_inode.c
     * fs_open.c
-    * fs_proc_base.c
+    * ~~fs_proc_base.c~~
+        * import missing, seems OK
     * ~~fs_proc_uptime.c~~
         * uptime_proc_show (30) is the same-ish as uptime_proc_read (29) but function name and params are diff. Patch only changes the function type (from static to not), seems OK
     * ~~fs_stat.c~~
