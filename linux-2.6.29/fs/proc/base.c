@@ -80,6 +80,16 @@
 #include <linux/oom.h>
 #include <linux/elf.h>
 #include <linux/pid_namespace.h>
+#ifdef CONFIG_KRG_KDDM
+#include <kerrighed/krgnodemask.h>
+#include <kddm/kddm.h>
+#endif
+#if defined(CONFIG_KRG_PROCFS) && defined(CONFIG_KRG_PROC)
+#include <kerrighed/pid.h>
+#endif
+#ifdef CONFIG_KRG_FAF
+#include <kerrighed/faf.h>
+#endif
 #include "internal.h"
 
 /* NOTE:
