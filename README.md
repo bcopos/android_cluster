@@ -41,7 +41,8 @@ Failed patches
     * arch_x86_include_asm_uaccess.h
     * ~~arch_x86_kernel_cpu_proc.c~~
         * different function call for cpu_mask, seems OK
-    * arch_x86_kernel_process_32.c
+    * ~~arch_x86_kernel_process_32.c~~
+        * line after patch (312-ish) is different, REVISIT THIS
     * arch_x86_kernel_process.c
 * fs
     * ~~fs_binfmt_elf_fdpic.c~~

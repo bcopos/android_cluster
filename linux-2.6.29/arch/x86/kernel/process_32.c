@@ -309,6 +309,9 @@ int copy_thread(int nr, unsigned long clone_flags, unsigned long sp,
 
 	p->thread.ip = (unsigned long) ret_from_fork;
 
+#ifdef CONFIG_KRG_EPM
+	if (!krg_current)
+#endif
 	savesegment(gs, p->thread.gs);
 
 	tsk = current;
