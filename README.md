@@ -45,7 +45,8 @@ Failed patches
     * fs_binfmt_elf_fdpic.c
     * fs_eventpoll.c
     * fs_exec.c
-    * fs_inode.c
+    * ~~fs_inode.c~~
+        * lines following patch were different, seems OK
     * ~~fs_nfs_inode.c~~
         * a conditional statement is missing from 29 but is irrelevant, seems OK
     * ~~fs_open.c~~

@@ -147,6 +147,10 @@ struct inode *inode_init_always(struct super_block *sb, struct inode *inode)
 	inode->i_cdev = NULL;
 	inode->i_rdev = 0;
 	inode->dirtied_when = 0;
+#ifdef CONFIG_KRG_DVFS
+	inode->i_objid = 0;
+#endif
+
 	if (security_inode_alloc(inode)) {
 		if (inode->i_sb->s_op->destroy_inode)
 			inode->i_sb->s_op->destroy_inode(inode);
