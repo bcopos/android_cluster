@@ -32,7 +32,8 @@ Failed patches
     * ~~kernel_fork.c~~
         * some "includes" missing
     * kernel_pid.c
-    * kernel_ptrace.c
+    * ~~kernel_ptrace.c~~
+        * last function to be patched (exit_ptrace) doesn't exist... REVISIT!
     * ~~kernel_sched.c~~
         * function to be patched (__schedule) doesn't exist but the code is in schedule() instead, applied patches there
 * arch

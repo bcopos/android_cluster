@@ -25,6 +25,89 @@
 #include <asm/pgtable.h>
 #include <asm/uaccess.h>
 
+#ifdef CONFIG_KRG_EPM
+#include <kerrighed/action.h>
+#include <kerrighed/krginit.h>
+#include <kerrighed/children.h>
+#include <kerrighed/krg_exit.h>
+#endif
+
+
+#ifdef CONFIG_KRG_EPM
+/* Helpers to make ptrace and migration mutually exclusive */
+
+int krg_ptrace_link(struct task_struct *task, struct task_struct *tracer)
+{
+	struct task_struct *parent;
+	int retval;
+
+	/* Lock to-be-ptraced task on this node */
+	retval = krg_action_disable(task, EPM_MIGRATE, 0);
+	if (retval)
+		goto bad_task;
+	/* Lock tracer on this node */
+	retval = krg_action_disable(tracer, EPM_MIGRATE, 0);
+	if (retval)
+		goto bad_tracer;
+	/* Lock parent on this node */
+	retval = -EPERM;
+	parent = task->parent;
+	if (parent == baby_sitter)
+		goto bad_parent;
+	if (!is_container_init(parent) && parent != tracer) {
+		retval = krg_action_disable(parent, EPM_MIGRATE, 0);
+		if (retval)
+			goto bad_parent;
+	}
+
+	return 0;
+
+bad_parent:
+	krg_action_enable(tracer, EPM_MIGRATE, 0);
+bad_tracer:
+	krg_action_enable(task, EPM_MIGRATE, 0);
+bad_task:
+	return retval;
+}
+
+/* Assumes at least read_lock on tasklist */
+/* Called with write_lock_irq on tasklist */
+void krg_ptrace_unlink(struct task_struct *task)
+{
+	BUG_ON(task->real_parent == baby_sitter);
+	if (!is_container_init(task->real_parent)
+	    && task->real_parent != task->parent)
+		krg_action_enable(task->real_parent, EPM_MIGRATE, 0);
+	BUG_ON(task->parent == baby_sitter);
+	krg_action_enable(task->parent, EPM_MIGRATE, 0);
+	krg_action_enable(task, EPM_MIGRATE, 0);
+}
+
+/* Assumes at least read_lock on tasklist */
+/* Called with write_lock_irq on tasklist */
+void krg_ptrace_reparent_ptraced(struct task_struct *real_parent,
+				 struct task_struct *task)
+{
+	/*
+	 * We do not support that the new real parent can migrate at
+	 * all. This will not induce new limitations as long as threads can not
+	 * migrate.
+	 */
+
+	/* Not really needed as long as zombies do not migrate... */
+	krg_action_enable(real_parent, EPM_MIGRATE, 0);
+	/* new real_parent has already been assigned. */
+	BUG_ON(task->real_parent == baby_sitter);
+	if (!is_container_init(task->real_parent)
+	    && task->real_parent != task->parent) {
+		int retval;
+
+		retval = krg_action_disable(task->real_parent, EPM_MIGRATE, 0);
+		BUG_ON(retval);
+	}
+}
+ 
+#endif /* CONFIG_KRG_EPM */
 
 /*
  * Initialize a new task whose father had been ptraced.
@@ -254,9 +337,15 @@ repeat:
 bad:
 	write_unlock_irqrestore(&tasklist_lock, flags);
 	task_unlock(task);
+#ifdef CONFIG_KRG_EPM
+	if (parent_children_obj)
+		krg_children_unlock(parent_children_obj);
+	up_read(&kerrighed_init_sem);
+#endif /* CONFIG_KRG_EPM */
 	mutex_unlock(&current->cred_exec_mutex);
 out:
 	return retval;
+
 }
 
 static inline void __ptrace_detach(struct task_struct *child, unsigned int data)
@@ -271,6 +360,10 @@ static inline void __ptrace_detach(struct task_struct *child, unsigned int data)
 
 int ptrace_detach(struct task_struct *child, unsigned int data)
 {
+#ifdef CONFIG_KRG_EPM
+	struct children_kddm_object *parent_children_obj;
+	pid_t real_parent_tgid;
+#endif
 	if (!valid_signal(data))
 		return -EIO;
 
@@ -287,9 +380,21 @@ int ptrace_detach(struct task_struct *child, unsigned int data)
 #endif /* CONFIG_KRG_EPM */
 	write_lock_irq(&tasklist_lock);
 	/* protect against de_thread()->release_task() */
-	if (child->ptrace)
+	if (child->ptrace) {
 		__ptrace_detach(child, data);
+#ifdef CONFIG_KRG_EPM
+		krg_set_child_ptraced(parent_children_obj, child, 0);
+#endif	
+	}
 	write_unlock_irq(&tasklist_lock);
+#ifdef CONFIG_KRG_EPM
+	if (parent_children_obj)
+		krg_children_unlock(parent_children_obj);
+#endif /* CONFIG_KRG_EPM */
+
+#ifdef CONFIG_KRG_EPM
+	up_read(&kerrighed_init_sem);
+#endif
 
 	return 0;
 }
