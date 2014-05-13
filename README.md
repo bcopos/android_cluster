@@ -76,3 +76,4 @@ Failed patches
     * ~~ipc_namespace.c~~
     * ~~ipc_util.h~~
 * Makefile
+	* added "-krg" to EXTRAVERSION variable of Makefile (line 4 or something)
