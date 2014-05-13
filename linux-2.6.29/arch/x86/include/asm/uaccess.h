@@ -186,6 +186,34 @@ extern int __get_user_bad(void);
 
 
 #ifdef CONFIG_X86_32
+#ifdef CONFIG_KRG_FAF
+
+#define __put_user_asm_u64(x, addr, err)			\
+	asm volatile("1:	movl %%eax,0(%2)\n"			\
+		     "2:	movl %%edx,4(%2)\n"			\
+		     "3:\n"						\
+		     ".section .fixup,\"ax\"\n"				\
+		     "4:	subl $4,%%esp\n"			\
+		     "  movl $8,(%%esp)\n"				\
+		     "	pushl %%edx\n"					\
+		     "	pushl %%eax\n"					\
+		     "	movl %2,%%eax\n"					\
+		     "	call ruaccess_put_user_asm\n"			\
+		     "	testl %%eax,%%eax\n"				\
+		     "	popl %%eax\n"					\
+		     "	popl %%edx\n"					\
+		     "	lea 4(%%esp),%%esp\n"				\
+		     "	jz 3b\n"					\
+		     "5:	movl %3,%0\n"				\
+		     "	jmp 3b\n"					\
+		     ".previous\n"					\
+		     _ASM_EXTABLE(1b, 4b)				\
+		     _ASM_EXTABLE(2b, 5b)				\
+		     : "=r" (err)					\
+		     : "A" (x), "r" (addr), "i" (-EFAULT), "0" (err))
+
+#else /* !CONFIG_KRG_FAF */
+
 #define __put_user_u64(x, addr, err)					\
 	asm volatile("1:	movl %%eax,0(%2)\n"			\
 		     "2:	movl %%edx,4(%2)\n"			\
@@ -198,6 +226,9 @@ extern int __get_user_bad(void);
 		     _ASM_EXTABLE(2b, 4b)				\
 		     : "=r" (err)					\
 		     : "A" (x), "r" (addr), "i" (-EFAULT), "0" (err))
+
+#endif /* !CONFIG_KRG_FAF */
+
 
 #define __put_user_x8(x, ptr, __ret_pu)				\
 	asm volatile("call __put_user_8" : "=a" (__ret_pu)	\
@@ -381,6 +412,8 @@ extern int ruaccess_get_user_asm(void);
 		     : "=r" (err), ltype(x)				\
 		     : "m" (__m(addr)), "i" (errret), "0" (err))
 
+#endif /* !CONFIG_KRG_FAF */
+
 #define __put_user_nocheck(x, ptr, size)			\
 ({								\
 	int __pu_err;						\
@@ -444,6 +477,9 @@ extern int ruaccess_put_user_asm(void);
 		     _ASM_EXTABLE(1b, 3b)				\
 		     : "=r"(err)					\
 		     : ltype(x), "m" (__m(addr)), "i" (errret), "0" (err))
+
+#endif /* CONFIG_KRG_FAF */
+
 /**
  * __get_user: - Get a simple variable from user space, with less checking.
  * @x:   Variable to store result.
