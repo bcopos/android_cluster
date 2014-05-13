@@ -78,6 +78,7 @@
 #endif
 #ifdef CONFIG_KRG_SCHED
 #include <kerrighed/scheduler/info.h>
+#endif
 
 #include <asm/pgtable.h>
 #include <asm/pgalloc.h>
