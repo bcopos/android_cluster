@@ -33,7 +33,8 @@ Failed patches
         * some "includes" missing
     * kernel_pid.c
     * kernel_ptrace.c
-    * kernel_sched.c
+    * ~~kernel_sched.c~~
+        * function to be patched (__schedule) doesn't exist but the code is in schedule() instead, applied patches there
 * arch
     * arch_x86_configs_i386_defconfig
     * arch_x86_configs_x86_64_defconfig

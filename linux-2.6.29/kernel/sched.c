@@ -4585,6 +4585,14 @@ asmlinkage void __sched schedule(void)
 	unsigned long *switch_count;
 	struct rq *rq;
 	int cpu;
+#ifdef CONFIG_KRG_EPM
+	struct task_struct *krg_cur;
+#endif
+ 
+#ifdef CONFIG_KRG_EPM
+	krg_cur = krg_current;
+	krg_current = NULL;
+#endif
 
 need_resched:
 	preempt_disable();
@@ -4651,6 +4659,10 @@ need_resched_nonpreemptible:
 
 	if (unlikely(reacquire_kernel_lock(current) < 0))
 		goto need_resched_nonpreemptible;
+
+#ifdef CONFIG_KRG_EPM
+	krg_current = krg_cur;
+#endif
 
 	preempt_enable_no_resched();
 	if (unlikely(test_thread_flag(TIF_NEED_RESCHED)))
