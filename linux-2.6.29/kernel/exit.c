@@ -1012,8 +1012,15 @@ static struct task_struct *find_new_reaper(struct task_struct *father)
 static void forget_original_parent(struct task_struct *father)
 {
 	struct task_struct *p, *n, *reaper;
+#ifdef CONFIG_KRG_EPM
+	struct children_kddm_object *children_obj = NULL;
+#endif
 	LIST_HEAD(ptrace_dead);
 
+#ifdef CONFIG_KRG_EPM
+	if (rcu_dereference(father->children_obj))
+		children_obj = __krg_children_writelock(father);
+#endif
 	write_lock_irq(&tasklist_lock);
 	reaper = find_new_reaper(father);
 	/*
@@ -1027,10 +1034,24 @@ static void forget_original_parent(struct task_struct *father)
 			BUG_ON(p->ptrace);
 			p->parent = p->real_parent;
 		}
+#ifdef CONFIG_KRG_EPM
+		else {
+			BUG_ON(!p->ptrace);
+			krg_ptrace_reparent_ptraced(father, p);
+		}
+#endif
 		reparent_thread(p, father);
 	}
 
 	write_unlock_irq(&tasklist_lock);
+#ifdef CONFIG_KRG_EPM
+	if (children_obj) {
+		/* Reparent remote children */
+		krg_forget_original_remote_parent(father, reaper);
+		krg_children_exit(father);
+	}
+#endif
+
 	BUG_ON(!list_empty(&father->children));
 
 	ptrace_exit_finish(father, &ptrace_dead);
@@ -1083,11 +1104,22 @@ static void exit_notify(struct task_struct *tsk, int group_dead)
 	 * we have changed execution domain as these two values started
 	 * the same after a fork.
 	 */
+#ifdef CONFIG_KRG_EPM
+	/* remote parent aware version of vanilla linux check (below) */
+	real_parent_self_exec_id = krg_get_real_parent_self_exec_id(tsk,
+								    krg_cookie);
+	if (tsk->exit_signal != SIGCHLD && !task_detached(tsk) &&
+	    (tsk->parent_exec_id != real_parent_self_exec_id ||
+	     tsk->self_exec_id != tsk->parent_exec_id) &&
+	    !capable(CAP_KILL))
+		tsk->exit_signal = SIGCHLD;
+#else
 	if (tsk->exit_signal != SIGCHLD && !task_detached(tsk) &&
 	    (tsk->parent_exec_id != tsk->real_parent->self_exec_id ||
 	     tsk->self_exec_id != tsk->parent_exec_id) &&
 	    !capable(CAP_KILL))
 		tsk->exit_signal = SIGCHLD;
+#endif
 
 	signal = tracehook_notify_death(tsk, &cookie, group_dead);
 	if (signal >= 0)

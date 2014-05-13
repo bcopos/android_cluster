@@ -27,7 +27,8 @@ Failed patches
         * line missing "include <linux/fs_struct.h>", irrelevant to patch... seems OK
     * ~~kernel_cgroup.c~~
         * patch adds code at the end of file, however v30 is very different thant v29, so this MAY NOT WORK
-    * kernel_exit.c
+    * ~~kernel_exit.c~~
+        * minor differences, seems OK
     * ~~kernel_fork.c~~
         * some "includes" missing
     * kernel_pid.c
