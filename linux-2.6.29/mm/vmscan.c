@@ -794,6 +794,9 @@ static unsigned long shrink_page_list(struct list_head *page_list,
 		 * Otherwise, leave the page on the LRU so it is swappable.
 		 */
 		if (PagePrivate(page)) {
+#ifdef CONFIG_KRG_MM
+			BUG_ON (page->obj_entry);
+#endif
 			if (!try_to_release_page(page, sc->gfp_mask))
 				goto activate_locked;
 			if (!mapping && page_count(page) == 1) {
@@ -1551,23 +1554,32 @@ static unsigned long shrink_list(enum lru_list lru, unsigned long nr_to_scan,
 static void get_scan_ratio(struct zone *zone, struct scan_control *sc,
 					unsigned long *percent)
 {
+#ifdef CONFIG_KRG_MM
+	unsigned long kddm, kddm_prio, kp;
+#endif
 	unsigned long anon, file, free;
 	unsigned long anon_prio, file_prio;
 	unsigned long ap, fp;
 	struct zone_reclaim_stat *reclaim_stat = get_reclaim_stat(zone, sc);
 
+#ifndef CONFIG_KRG_MM
 	/* If we have no swap space, do not bother scanning anon pages. */
 	if (nr_swap_pages <= 0) {
 		percent[0] = 0;
 		percent[1] = 100;
 		return;
 	}
+#endif
 
 	anon  = zone_nr_pages(zone, sc, LRU_ACTIVE_ANON) +
 		zone_nr_pages(zone, sc, LRU_INACTIVE_ANON);
 	file  = zone_nr_pages(zone, sc, LRU_ACTIVE_FILE) +
 		zone_nr_pages(zone, sc, LRU_INACTIVE_FILE);
 
+#ifdef CONFIG_KRG_MM
+	kddm  = zone_nr_pages(zone, sc, LRU_ACTIVE_MIGR) +
+		zone_nr_pages(zone, sc, LRU_INACTIVE_MIGR);
+#else
 	if (scanning_global_lru(sc)) {
 		free  = zone_page_state(zone, NR_FREE_PAGES);
 		/* If we have very few page cache pages,
@@ -1679,7 +1691,11 @@ static void shrink_zone(int priority, struct zone *zone,
 	get_scan_ratio(zone, sc, percent);
 
 	for_each_evictable_lru(l) {
+#ifdef CONFIG_KRG_MM
+		int file = RECLAIM_STAT_INDEX(is_file_lru(l), is_kddm_lru(l));
+#else
 		int file = is_file_lru(l);
+#endif
 		int scan;
 
 		scan = zone_nr_pages(zone, sc, l);

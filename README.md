@@ -21,7 +21,8 @@ Failed patches
     * ~~net_tipc_node.c~~
         * same story as above... seems OK
 * mm
-    * mm_vmscan.c
+    * ~~mm_vmscan.c~~
+        * minor differences... seems OK
 * kernel
     * ~~kernel_auditsc.c~~
         * line missing "include <linux/fs_struct.h>", irrelevant to patch... seems OK
