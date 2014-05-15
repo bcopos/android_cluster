@@ -1,0 +1,173 @@
+#! /bin/sh
+#
+# kerrighed     Initialize kerrighed container
+#
+# Authors:	Jean Parpaillon <jean.parpaillon@irisa.fr>
+#               Cyril Brulebois <cyril.brulebois@kerlabs.com>
+#
+# Copyright:    INRIA-IRISA - 2006-2007
+#               Kerlabs - 2008-2010
+#
+
+### BEGIN INIT INFO
+# Provides:          kerrighed-host
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Initialize Kerrighed container
+# Description:       Initialize the Kerrighed container
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+NAME=kerrighed-host
+DESC="Kerrighed host"
+
+CFG=/etc/default/$NAME
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Read config file if it is present.
+if [ -r $CFG ]; then
+    . $CFG
+fi
+
+. /lib/lsb/init-functions
+
+#
+# Check if running a Kerrighed kernel
+#
+d_check_kerrighed() {
+    test -d /sys/kerrighed
+}
+
+#
+# Start the Kerrighed container
+#
+d_start_container() {
+    krgboot_helper
+}
+
+#
+# Function that starts the daemon/service.
+#
+d_start() {
+    log_progress_msg "isolate_uts"
+    if ! d_set_isolate_ns "$ISOLATE_UTS" isolate_uts; then
+	log_progress_msg "(failed)"; STATUS=1
+    fi
+
+    log_progress_msg "isolate_mnt"
+    if ! d_set_isolate_ns "$ISOLATE_MNT" isolate_mnt; then
+	log_progress_msg "(failed)"; STATUS=1
+    fi
+
+    log_progress_msg "isolate_net"
+    if ! d_set_isolate_ns "$ISOLATE_NET" isolate_net; then
+	log_progress_msg "(failed)"; STATUS=1
+    fi
+
+    log_progress_msg "isolate_user"
+    if ! d_set_isolate_ns "$ISOLATE_USER" isolate_user; then
+	log_progress_msg "(failed)"; STATUS=1
+    fi
+
+    log_progress_msg "cluster_init"
+    if ! echo -n $CLUSTER_INIT_HELPER > /sys/kerrighed/hotplug/cluster_init_helper; then
+	log_progress_msg "(failed)"; STATUS=1
+    fi
+
+    log_progress_msg "net_devices"
+    for dev in $NET_DEVICES; do
+	log_progress_msg "$dev"
+	if ! echo $dev > /sys/kerrighed/net_devices; then
+	    log_progress_msg "(failed)"; STATUS=1
+	fi
+    done
+
+    if test "$(cat /sys/kerrighed/node_id)" = "$BOOT_ID"; then
+	log_progress_msg "container"
+	if [ "$STATUS" = "1" ]; then
+	    log_progress_msg "not starting due to previous errors"
+	elif ! d_start_container; then
+	    log_progress_msg "(failed)"; STATUS=1
+	fi
+    fi
+
+    return ${STATUS:-0}
+}
+
+d_set_isolate_ns() {
+    case "x$1" in
+        xtrue)
+            echo 1 > /sys/kerrighed/hotplug/$2 || STATUS=1
+            ;;
+        xfalse)
+            echo 0 > /sys/kerrighed/hotplug/$2 || STATUS=1
+            ;;
+        x)
+            ;;
+        *)
+            log_progress_msg "value of ISOLATE_xxx in $CFG must be either 'true' or 'false'"
+	    STATUS=1
+            ;;
+    esac
+
+    return ${STATUS:-0}
+}
+
+#
+# Function that stops the daemon/service.
+#
+d_stop() {
+    true
+}
+
+#
+# Function that prints if kerrighed is started or not
+#
+d_status() {
+    d_check_kerrighed
+    ret=$?
+    if [ $ret -eq 0 ]; then
+	log_progress_msg "running Kerrighed kernel"
+    else
+	log_progress_msg "not running Kerrighed kernel"
+    fi
+    return $ret
+}
+
+if ! d_check_kerrighed; then
+    log_failure_msg "Not running a Kerrighed kernel"
+    exit 0
+else
+    case "$1" in
+	start)
+	    log_daemon_msg "Starting $DESC"
+	    d_start || log_end_msg 1
+	    log_end_msg 0
+	    ;;
+	stop)
+	    log_daemon_msg "Stopping $DESC"
+	    d_stop || log_end_msg 1
+	    log_end_msg 0
+	    ;;
+	status)
+	    log_daemon_msg "$DESC status"
+	    d_status
+	    log_end_msg 0
+	    ;;
+	restart)
+	    log_daemon_msg "Restart $DESC"
+	    d_stop || log_end_msg 1
+	    d_start || log_end_msg 1
+	    log_end_msg 0
+	    ;;
+	*)
+	    log_success_msg "Usage: $SCRIPTNAME {start|stop|restart|status}"
+	    exit 1
+	    ;;
+    esac
+fi
+
+exit 0

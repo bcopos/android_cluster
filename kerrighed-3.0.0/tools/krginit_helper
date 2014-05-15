@@ -1,0 +1,31 @@
+#!/bin/sh
+
+set -e
+
+KRG_ROOT=/
+# Path inside $KRG_ROOT
+KRGINIT=/usr/local/sbin/krginit
+
+error() {
+    echo "E: $@"
+    exit 1
+}
+
+if [ ! -x "$KRG_ROOT$KRGINIT" ]; then
+    error "Can not find krginit: $KRG_ROOT$KRGINIT"
+fi
+
+. /usr/local/etc/kerrighed/krginit_helper.conf
+
+# Prefer caller args
+if [ $# -gt 0 ]; then
+	KRGINIT_ARGS=
+fi
+
+mount -t proc krg-procfs $KRG_ROOT/proc
+
+cd  $KRG_ROOT
+if [ "$KRG_ROOT" != "/" ]; then
+	mount --move . /
+fi
+eval exec chroot . $KRGINIT -s $KRGINIT_ARGS "$@"

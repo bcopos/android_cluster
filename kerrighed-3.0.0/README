@@ -1,0 +1,49 @@
+                     Kerrighed
+		     ---------
+
+These are the release notes for Kerrighed 
+
+
+WHAT IS KERRIGHED ?
+
+	
+  Kerrighed is a Single System Image operating system for clusters.
+  Kerrighed offers the view of a unique SMP machine on top of a
+  cluster of standard PCs.
+
+  Kerrighed is implemented as an extension to Linux operating system
+  (a set of Linux modules and a small patch to the kernel).
+
+  Kerrighed main features are :
+
+    * Customizable Cluster Wide Process Scheduler.
+
+        Processes are automatically scheduled over the cluster nodes
+        to balance the CPU load using the Kerrighed default scheduling
+        algorithm. However, Kerrighed offers a toolkit to easily write
+        customized schedulers hot-loadable through kernel modules.
+
+    * Cluster Wide Shared Memory.
+
+        System V memory segments can operate through the whole
+        cluster, just like on an SMP machine.
+
+    * Process Checkpointing.
+
+        Processes can be checkpointed and restarted on any cluster
+        node.
+
+    * Cluster Wide Unix Process Interface.
+
+        All traditional UNIX process management commands (top, ps, kill,
+        etc) operate cluster wide. Moreover, process identifiers (pid)
+        are unique cluster wide.
+
+    * Customizable Single System Image Features.
+
+        Single system image features (shared memory, global scheduler,
+        migrable streams, etc) can be enabled or desabled on a per
+        process basis.
+
+  The present implemention of Kerrighed is compatible with version
+  2.6.30 of Linux kernel.

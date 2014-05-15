@@ -1,0 +1,15 @@
+#=====================================================
+# /etc/default/kerrighed
+#
+#=====================================================
+
+# krgadm nodes add options. Can be used to wait for some nodes.
+# If empty, no nodes is added to the cluster.
+# See man krgadm(1)
+ADD_OPTS="--all"
+#ADD_OPTS="--total 4"
+#ADD_OPTS="--nodes 1-4"
+
+# Enable/Disable legacy scheduler behaviour
+LEGACY_SCHED=true
+#LEGACY_SCHED=false

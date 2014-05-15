@@ -1,0 +1,43 @@
+#=====================================================
+# /etc/default/kerrighed
+#
+#=====================================================
+
+# Start Kerrighed container on this node. If -1, does not start container.
+BOOT_ID=-1
+#BOOT_ID=1
+
+# Local namespaces to isolate Kerrighed from
+# Leaving unset won't change kernel's current settings
+
+# UTSname namespace
+ISOLATE_UTS=true
+#ISOLATE_UTS=false
+#ISOLATE_UTS=
+
+# Mount namespace
+ISOLATE_MNT=true
+#ISOLATE_MNT=false
+#ISOLATE_MNT=
+
+# Net namespace
+#ISOLATE_NET=true
+ISOLATE_NET=false
+#ISOLATE_NET=
+
+# User namespace
+#ISOLATE_USER=true
+ISOLATE_USER=false
+#ISOLATE_USER=
+
+# Userspace application to use as local init process in the Kerrighed container
+# Something else may be used on the node starting the cluster.
+# krginit_helper has his configuration in /etc/kerrighed/krginit_helper.conf
+CLUSTER_INIT_HELPER=@sbindir@/krginit_helper
+
+# Net devices used by Kerrighed's internal RPC service
+# Format: ALL | dev1 [dev2 ...]
+# ALL is not recommended but is a conservative safe default
+NET_DEVICES=ALL
+#NET_DEVICES=eth1
+#NET_DEVICES=eth0 eth2

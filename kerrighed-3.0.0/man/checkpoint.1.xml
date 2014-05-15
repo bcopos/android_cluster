@@ -1,0 +1,389 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+
+<refentry id='checkpoint.1'>
+  <refmeta>
+    <refentrytitle>checkpoint</refentrytitle>
+    <manvolnum>1</manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>checkpoint</refname>
+    <refpurpose>Checkpoint an application.</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>checkpoint</command>
+      <arg choice="opt" ><replaceable>OPTIONS</replaceable></arg>
+      <arg choice="plain" ><replaceable>pid</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+    <para>
+      <command>checkpoint</command> checkpoints a running application identified
+      by one of its processes given by <varname>pid</varname>.
+    </para>
+    <para>
+      Checkpoint/Restart basically consists of storing a snapshot of the current
+      application state. Later on, application can be restarted from this snapshot.
+      It can be useful for fault tolerance, scheduling, hardware maintenance and
+      debugging.
+    </para>
+    <para>
+      Checkpointing an application consists in three steps: freezing the
+      application, saving the application state on disk, unfreezing the
+      application. By default, all three steps are run in sequence.
+    </para>
+    <para>
+      To allow an application to be checkpointed, one must set the
+      CHECKPOINTABLE capability. See <command>krgcr-run</command>(1),
+      <command>krgcapset</command>(1)) and <command>kerrighed_capabilities</command>(7)
+      for further details.
+    </para>
+    <para>
+      In general case, an application consists of a tree of processes or
+      threads. The root process of the application must have the CHECKPOINTABLE
+      capability effective and inheritable before creating other processes or
+      threads (See <function>fork</function>(2), <function>clone</function>(2),
+      and <function>pthread_create</function>(3)).
+    </para>
+    <para>
+      If the root application process exits later, all its children processes
+      are still considered as processes of the same application.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term><option>-h</option></term>
+	  <term><option>--help</option></term>
+	  <listitem>
+	    <para>Print help and exit.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><option>-v</option></term>
+	  <term><option>--version</option></term>
+	  <listitem>
+	    <para>Print version informations and exit.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><option>-a</option></term>
+	  <term><option>--from-appid</option></term>
+	  <listitem>
+	    <para>Use <varname>pid</varname> as an application identifier, not
+	      as a standard process identifier.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><option>-f</option></term>
+	  <term><option>--freeze</option></term>
+	  <listitem>
+	    <para>
+	      Freeze an application without checkpointing it. It is useful if
+	      you have to save some objects (such as files) before running the
+	      checkpoint without racing with the application.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><option>-u</option> <optional><replaceable>signal</replaceable></optional></term>
+	  <term><option>--unfreeze</option>=<optional><replaceable>signal</replaceable></optional></term>
+	  <listitem>
+	    <para>
+	      Unfreeze an application previously frozen without checkpointing
+	      it. Optionally, it sends a signal <replaceable>signal</replaceable>
+	      to all processes of the application just before unfreezing it. The
+	      signal will be handled by each process as soon as the process is
+	      woken up. By default, no signal is sent.
+	      <replaceable>signal</replaceable> must be given as a numerical
+	      value. The list of signal numbers can be retrieved with
+	      <command>kill -L</command>.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><option>-c</option></term>
+	  <term><option>--ckpt-only</option></term>
+	  <listitem>
+	    <para>Checkpoint an already frozen application.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><option>-k</option> <optional><replaceable>signal</replaceable></optional></term>
+	  <term><option>--kill</option>=<optional><replaceable>signal</replaceable></optional></term>
+	  <listitem>
+	    <para>
+	      Send a signal <replaceable>signal</replaceable> to all processes
+	      of the application after checkpointing the running application
+	      and before unfreezing the application. The signal will be handled
+	      by each process as soon as the process is woken up. By default, it
+	      sends the SIGTERM signal. <replaceable>signal</replaceable> must
+	      be given as a numerical value. The list of signal numbers can be
+	      retrieved with <command>kill -L</command>.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><option>-i</option></term>
+	  <term><option>--ignore-unsupported-files</option></term>
+	  <listitem>
+	    <para>Allow to checkpoint an application even if the application is
+	      using some files, which type is not supported by checkpoint/restart
+	      mechanisms (such as socket). At restart time, file descriptor appear
+	      to be closed. Without this option, if there is some unsupported files,
+	      <command>checkpoint</command> fails with 'Function not implemented'.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><option>-d <replaceable>description</replaceable></option></term>
+	  <term><option>--description=<replaceable>description</replaceable></option></term>
+	  <listitem>
+	    <para>
+	      Associate a description <replaceable>description</replaceable>
+	      with the checkpoint. The description is recorded in
+	      <filename>description.txt</filename> in the
+	      checkpoint folder (see FILES below).
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+
+    <para>
+      Options <option>--freeze</option>, <option>--ckpt-only</option>,
+      <option>--unfreeze</option>, <option>--kill</option> are mutually exclusive.
+    </para>
+
+    <para>
+      Options <option>--description</option> and
+      <option>--ignore-unsupported-files</option> make sense only when
+      really checkpointing the application.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Supported applications and limitations</title>
+
+    <para>Multi-process applications and multithreaded programs are supported.
+      To be able to restart the application, all process identifiers (including
+      process group and session identifier) used by the application must be
+      unused. Option <option>--pid</option> of <command>restart</command>(1) may
+      be useful if process group leader or session leader has not been
+      checkpointed.
+    </para>
+
+    <para>Checkpointing applications with zombie processes is not supported.
+    </para>
+
+    <para>Checkpointing of applications using socket(s) or named pipe(s) (fifo) is
+      not supported (unless using <option>--ignore-unsupported-files</option>).
+      Therefore, graphic applications are not supported since
+      there are using sockets to communicate with the X server.
+    </para>
+
+    <para>Checkpointing of application using anonymous pipe(s) may work
+      depending on where the processes are running. Else, it fails at checkpoint
+      time with 'Function not implemented'.
+    </para>
+
+    <para>System V IPC objects are not restored but it is possible to checkpoint
+      an application that is currently waiting on such IPC objects. For instance,
+      you can checkpoint a process waiting to receive a message from a message
+      queue. The process will replay the action after the restart if the IPC
+      objects still exits. State of System V IPC objects can be saved and
+      restored using respectfully <command>ipccheckpoint</command>(1) and
+      <command>ipcrestart</command>(1). For consistency, application should be
+      frozen before saving state of System V IPC objects.
+    </para>
+
+    <para>Similarly to System V IPC objects, POSIX shared memory segment (SHM)
+      are not checkpointed with the application. However, similarly to System V
+      shared memory segments, POSIX shared memory segments can be saved
+      independently. Process(es) will be reattached at restart time if the shared
+      memory segments still exist or if they have been restored. In Linux, state
+      of POSIX shared memory segment can be saved/restored by copying
+      (using <command>cp</command>(1)) from/to
+      <filename>/dev/shm/<replaceable>&lt;shm_name&gt;</replaceable></filename>.
+      For consistency, application should be frozen before saving state of POSIX
+      shared memory segment (SHM).
+    </para>
+
+    <para>Files are not checkpointed nor restored. The files are reopened at
+      restart time and file pointers are restored. That means that files must be
+      in consistent states at restart time. Else, you can expect a strange
+      behavior from your application. You can take advantage of the
+      <option>--freeze</option> option before the checkpoint to manually backup
+      the files.
+    </para>
+
+    <para>
+      To restart your application, you must run exactly the same kernel as
+      before the checkpoint. Thus, you can not expect to checkpoint an
+      application before upgrading your kernel and restart once the upgrade is
+      done.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Example</title>
+    <para>
+      The following example shows how to start an application, checkpoint it and restart it.
+    </para>
+    <refsect2>
+      <title>Start the application</title>
+
+      <para>$ krgcr-run ./mycomputeprogram 12 1024 58</para>
+
+    </refsect2>
+    <refsect2>
+      <title>Checkpoint the application</title>
+      <para>
+	<variablelist>
+	  <varlistentry>
+	    <term>Freeze the application:</term>
+	    <listitem>
+	      <para>$ checkpoint --freeze `pgrep mycomputeprogram`</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Save related System V IPC objects:</term>
+	    <listitem>
+	      <para>$ ipccheckpoint -s 2 ~/chkpt/ipcsem.bin</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Save related POSIX shared memory segments:</term>
+	    <listitem>
+	      <para>$ cp /dev/shm/shm_computeprogram12 ~/chkpt/shm_computeprogram12.bin</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Save related files:</term>
+	    <listitem>
+	      <para>$ cp ./compute12_result.log ~/chkpt/compute12_result.log</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Dump state of application processes:</term>
+	    <listitem>
+	      <para>$ checkpoint --ckpt-only `pgrep mycomputeprogram`</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Unfreeze the application:</term>
+	    <listitem>
+	      <para>$ checkpoint --unfreeze `pgrep mycomputeprogram`</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </para>
+    </refsect2>
+
+    <refsect2>
+      <title>Restart the application</title>
+      <para>
+	Later, you may want to restart your application from the last
+	checkpoint.
+      </para>
+      <para>
+	<variablelist>
+	  <varlistentry>
+	    <term>Restore related System V IPC objects:</term>
+	    <listitem>
+	      <para>$ ipcrestart -s ~/chkpt/ipcsem.bin</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Restore related POSIX shared memory segments:</term>
+	    <listitem>
+	      <para>$ cp ~/chkpt/shm_computeprogram12.bin /dev/shm/shm_computeprogram12</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Restore related files:</term>
+	    <listitem>
+	      <para>$ cp ~/chkpt/compute12_result.log ./compute12_result.log</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      Finally, restart the program using its <replaceable>appid</replaceable>
+	      (1632 in this example):
+	    </term>
+	    <listitem>
+	      <para>$ restart --foreground 1632 1</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </para>
+    </refsect2>
+
+  </refsect1>
+
+  <refsect1>
+    <title>Files</title>
+    <para>
+      <variablelist>
+	<varlistentry>
+	  <term><filename>/var/chkpt</filename></term>
+	  <listitem>
+	    <para>
+	      This directory is default location for disk checkpoints.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>/var/chkpt/&lt;appid&gt;/v&lt;version&gt;/</filename></term>
+	  <listitem>
+	    <para>
+	      This directory contains the <varname>n</varname>th checkpoint
+	      (with <varname>n</varname> equals to <varname>version</varname>)
+	      of application identified by <varname>appid</varname>.
+	    </para>
+	    <para>
+	      To remove a checkpoint from disk, remove this folder.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Authors</title>
+    <para>
+      Matthieu Fertré <email>matthieu.fertre@kerlabs.com</email>,
+      Renaud Lottiaux <email>renaud.lottiaux@kerlabs.com</email>
+    </para>
+  </refsect1>
+
+  <refsect1 id="see_also" >
+    <title>See Also</title>
+    <para>
+      <ulink url="restart.1.html" ><command>restart</command>(1)</ulink>,
+      <ulink url="ipccheckpoint.1.html" ><command>ipccheckpoint</command>(1)</ulink>,
+      <ulink url="ipcrestart.1.html" ><command>ipcrestart</command>(1)</ulink>,
+      <ulink url="krgcr-run.1.html" ><command>krgcr-run</command>(1)</ulink>,
+      <ulink url="krgcapset.1.html" ><command>krgcapset</command>(1)</ulink>,
+      <ulink url="kerrighed_capabilities.7.html" ><command>kerrighed_capabilities</command>(7)</ulink>,
+    </para>
+  </refsect1>
+</refentry>

@@ -1,0 +1,176 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
+"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+
+<refentry id='kerrighed.7'>
+  <refmeta>
+    <refentrytitle>kerrighed</refentrytitle>
+    <manvolnum>7</manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>kerrighed</refname>
+    <refpurpose> a Linux based Single System Image. </refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>Kerrighed</command>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+    <para>
+      Kerrighed is a Single System Image operating system for clusters. Kerrighed offers
+      the view of a unique SMP machine on top of a cluster of standard PCs. Kerrighed 
+      main features are :  
+      
+      <variablelist>
+	<varlistentry>
+	  <term>Configurable Global Process Scheduler:</term>
+	  <listitem>
+	    <para>
+	      Processes and threads are 
+	      automatically scheduled over the cluster nodes to balance the CPU load using 
+	      the Kerrighed default scheduling algorithm. However, Kerrighed offers a 
+	      toolkit to easily write personal schedulers hot-loadable through kernel modules. 
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>Distributed Shared Memory:</term>
+	  <listitem>
+	    <para>
+	      Threads and System V memory segments can operate 
+	      through the whole cluster, just like on a SMP machine.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>High Performance Stream Migration Mechanism:</term>
+	  <listitem>
+	    <para>
+	      Processes using streams (socket, 
+	      pipe, fifo, char device, etc) can be migrated with no penalty on communications
+	      performance.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>Distributed File System:</term>
+	  <listitem>
+	    <para>
+	      A unique file name space is seen over the whole cluster. 
+	      All nodes disk are merged in an unique global virtual disk.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>Process Check-pointing:</term>
+	  <listitem>
+	    <para>
+	      Processes can be check-pointed and restarted on any 
+	      cluster node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>Full System V Interface:</term>
+	  <listitem>
+	    <para>
+	      Full Posix Thread Interface.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+
+    <para>
+      Kerrighed is implemented as an extension to Linux operating system (a set of Linux 
+      modules and a small patch to the kernel). Kerrighed is independent of the cluster 
+      interconnection network.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Configuration</title>
+    <para>
+      Kerrighed kernel is setup through boot parameters.
+    </para>
+
+    <refsect2>
+      <title>Boot parameters</title>
+      <para>
+	<variablelist>
+	  <varlistentry>
+	    <term>session_id=X</term>
+	    <listitem>
+	      <para>
+		The <varname>session_id</varname> contains identifier
+		of the cluster. When several Kerrighed clusters have
+		to share the same ethernet switch, each cluster should
+		define a different session identifier to avoid
+		collisions. A session identifier is a simple integer.
+		Valid range is 1..9999.
+	      </para>
+	      <para>
+		This parameter is mandatory.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>node_id=Y</term>
+	    <listitem>
+	      <para>
+		The <varname>node_id</varname> contains identifier of
+		the node. It is an integer. It must be unique over the
+		Kerrighed cluster.
+		Valid range is 0..255.
+	      </para>
+	      <para>
+		Unless <varname>autonodeid</varname> is activated this
+		parameter is mandatory.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>autonodeid=0|1</term>
+	    <listitem>
+	      <para>
+		When <varname>autonodeid</varname> value is
+		1, <varname>node_id</varname> is the last digit of the
+		IP address. This implies NIC driver to be compiled
+		into the kernel and IP address to be set really early,
+		either by DHCP or as kernel boot parameters
+		(see <command>bootparam</command>(7)).
+	      </para>
+	      <para>
+		Default is 1 (activated).
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </para>
+    </refsect2>
+  </refsect1>
+
+  <refsect1>
+    <title>Authors</title>
+    <para>
+      Renaud Lottiaux <email>renaud.lottiaux@kerlabs.com</email>
+    </para>
+    <para>
+      Jean Parpaillon <email>jean.parpaillon@kerlabs.com</email>
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>See also</title>
+    <para>
+      <ulink url="kerrighed_capabilities.7.html" ><command>kerrighed_capabilities</command> (7)</ulink>, 
+      <ulink url="migrate.1.html" ><command>migrate</command> (1)</ulink>, 
+      <ulink url="krgcapset.1.html" ><command>krgcapset</command> (1)</ulink>, 
+      <ulink url="checkpoint.1.html" ><command>checkpoint</command> (1)</ulink>
+    </para>
+  </refsect1>
+</refentry>

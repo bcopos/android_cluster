@@ -1,0 +1,206 @@
+'\" t
+.\"     Title: krgadm
+.\"    Author: [see the "Author" section]
+.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
+.\"      Date: 06/07/2010
+.\"    Manual: [FIXME: manual]
+.\"    Source: [FIXME: source]
+.\"  Language: English
+.\"
+.TH "KRGADM" "1" "06/07/2010" "[FIXME: source]" "[FIXME: manual]"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+krgadm \- Manage a Kerrighed cluster
+.SH "SYNOPSIS"
+.HP \w'\fBkrgadm\fR\ 'u
+\fBkrgadm\fR [\-h | \-\-help] [\-\-version]
+.HP \w'\fBkrgadm\fR\ 'u
+\fBkrgadm\fR cluster {status | poweroff | reboot}
+.HP \w'\fBkrgadm\fR\ 'u
+\fBkrgadm\fR nodes\ status [\-n\ |\ \-\-nodes\ \fInode_list\fR]
+.HP \w'\fBkrgadm\fR\ 'u
+\fBkrgadm\fR nodes {add | del} [\-n\ |\ \-\-nodes\ \fInode_list\fR] [\-c\ |\ \-\-count\ \fInode_count\fR] [\-t\ |\ \-\-total\ \fInode_count\fR] [\-a | \-\-all]
+.SH "DESCRIPTION"
+.PP
+
+\fBkrgadm\fR
+allows the user to manage Kerrighed nodes\&.
+.PP
+Each
+\fBkrgadm\fR
+invocation is followed by a command and some options relative to this mode\&.
+.SH "GENERAL OPTIONS"
+.PP
+.PP
+\-h, \-\-help
+.RS 4
+Print help and exit
+.RE
+.PP
+\-\-version
+.RS 4
+Print version informations and exit
+.RE
+.SH "MODES"
+.PP
+.PP
+cluster
+.RS 4
+Manage the cluster\&.
+.RE
+.PP
+nodes
+.RS 4
+Manage nodes inside the cluster\&.
+.RE
+.SH "CLUSTER COMMANDS"
+.PP
+.PP
+status
+.RS 4
+Print cluster status
+.RE
+.PP
+poweroff
+.RS 4
+Power off all nodes belonging to the cluster
+.RE
+.PP
+reboot
+.RS 4
+Reboot all nodes belonging to the cluster
+.RE
+.SH "NODES COMMANDS"
+.PP
+.PP
+status [\-n | \-\-nodes\ \fInode_list\fR]
+.RS 4
+Prints nodes status\&.
+.sp
+With the
+\-\-nodes
+option, prints only given nodes status\&.
+.RE
+.PP
+add [\-n | \-\-nodes\ \fInode_list\fR] [\-c | \-\-count\ \fInode_count\fR] [\-t | \-\-total\ \fInode_count\fR] [\-a | \-\-all]
+.RS 4
+Add nodes to the running cluster\&.
+.sp
+With the
+\-\-nodes
+option, wait for given nodes to be present, then add them to the running cluster\&.
+.sp
+With the
+\-\-count
+option, wait for the given number of nodes to be present, then add them to the running cluster\&.
+.sp
+With the
+\-\-total
+option, add enough nodes to get the given number of nodes in the resulting cluster\&. Wait for nodes to be present if necessary\&.
+.sp
+With the
+\-\-all
+option, add all the available node (state present) to the running cluster\&.
+.sp
+One and only one of the options
+\-\-nodes,
+\-\-count,
+\-\-total
+or
+\-\-all
+must be used\&.
+.RE
+.PP
+del [\-n | \-\-nodes\ \fInode_list\fR] [\-c | \-\-count\ \fInode_count\fR] [\-t | \-\-total\ \fInode_count\fR] [\-a | \-\-all]
+.RS 4
+Remove nodes from the running cluster\&.
+.sp
+With the
+\-\-nodes
+option, remove the given list of nodes, if they are in the cluster\&.
+.sp
+With the
+\-\-count
+option, remove the given number of nodes from the cluster\&. Fail if there are no such nodes\&.
+.sp
+With the
+\-\-total
+option, remove enough nodes to get given number of nodes in the resulting cluster\&. Fail if there are no such nodes\&.
+.sp
+With the
+\-\-all
+option, remove all nodes of the cluster, except current one\&.
+.sp
+One and only one of the options
+\-\-nodes,
+\-\-count,
+\-\-total
+or
+\-\-all
+must be used\&.
+.RE
+.SH "NODES LIST SYNTAX"
+.PP
+For all actions accepting a nodes list, syntax is the following:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+nodeslist ::= item(,item)+
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+item ::= (nodeid|noderange)
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+noderange ::= nodeid\-nodeid
+.RE
+.sp
+.SH "AUTHOR"
+.PP
+Renaud Lottiaux
+renaud\&.lottiaux@kerlabs\&.com
+.PP
+Jean Parpaillon
+jean\&.parpaillon@kerlabs\&.com
+.PP
+Matthieu Fertré
+matthieu\&.fertre@kerlabs\&.com

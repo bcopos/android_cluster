@@ -1,0 +1,136 @@
+#! /bin/sh
+#
+# kerrighed     Start Kerrighed services
+#
+# Authors:	Jean Parpaillon <jean.parpaillon@irisa.fr>
+#           Cyril Brulebois <cyril.brulebois@kerlabs.com>
+#
+# Copyright: Kerlabs - 2008-2009
+#
+# This script check it is run inside a Kerrighed container.
+#
+
+### BEGIN INIT INFO
+# Provides:          kerrighed
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Kerrighed services
+# Description:       Kerrighed services
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+NAME=kerrighed
+DESC="Kerrighed services"
+
+CFG=/etc/default/$NAME
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Read config file if it is present.
+if [ -r $CFG ]; then
+    . $CFG
+fi
+
+. /lib/lsb/init-functions
+
+#
+# Check if running in a Kerrighed container
+#
+d_check_kerrighed() {
+    # TODO: improve detection of Kerrighed container
+    krgadm cluster > /dev/null 2>&1
+    return $?
+}
+
+#
+# Check if running on the boot node of the cluster, before adding other nodes
+#
+d_check_boot_node() {
+    [ "`krgadm nodes | grep -c online`" = "1" ]
+}
+
+d_start_scheduler() {
+    log_progress_msg "scheduler"
+
+    case "x$LEGACY_SCHED" in
+	xtrue)
+	    krg_legacy_scheduler > /dev/null 2>&1
+	    return $?
+	    ;;
+	xfalse)
+	    log_progress_msg "disabled in $CFG"
+	    return 0
+	    ;;
+	*)
+	    log_progress_msg "value of LEGACY_SCHED in $CFG must be either 'true' or 'false'"
+	    return 1
+	    ;;
+    esac
+}
+
+#
+# Function that starts the daemon/service.
+#
+d_start() {
+    log_daemon_msg "Starting $DESC"
+
+    if d_check_boot_node; then
+	log_progress_msg "boot node"
+
+	d_start_scheduler || STATUS=1
+	if [ -n "$ADD_OPTS" ]; then
+	    log_progress_msg "nodes"
+	    krgadm nodes add $ADD_OPTS > /dev/null || STATUS=1
+	fi
+    fi
+
+    log_end_msg ${STATUS:-0}
+    return $?
+}
+
+#
+# Function that stops the daemon/service.
+#
+d_stop() {
+    log_daemon_msg "Stopping $DESC"
+    log_end_msg 0
+    return $?
+}
+
+#
+# Function that prints if kerrighed is started or not
+#
+d_status() {
+    log_daemon_msg  "$DESC status"
+    log_progress_msg $(krgadm cluster status | sed 's/^status: //')
+    log_end_msg 0
+    return 0
+}
+
+if ! d_check_kerrighed; then
+    log_failure_msg "Must be run inside Kerrighed container"
+    STATUS=1
+else
+    case "$1" in
+	start)
+	    d_start
+	    STATUS=$?
+	    ;;
+	stop)
+	    d_stop
+	    STATUS=$?
+	    ;;
+	status)
+	    d_status
+	    STATUS=$?
+	    ;;
+	*)
+	    log_success_msg "Usage: $SCRIPTNAME {start|stop|restart|status}"
+	    STATUS=1
+	    ;;
+    esac
+fi
+
+exit ${STATUS:-0}

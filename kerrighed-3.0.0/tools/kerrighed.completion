@@ -1,0 +1,170 @@
+#
+# Completion of Kerrighed tools
+#
+
+# This function complete node ids.
+# $1 is one of 'online' 'present' or 'possible'
+_nodes()
+{
+    case $1 in
+	'online')
+	    COMPREPLY=( $(compgen -W '$( command krgadm nodes | sed "/online$/!d; s/:online$//" )' -- "$cur") )
+	    ;;
+	'present')
+            COMPREPLY=( $(compgen -W '$( command krgadm nodes | sed "/present$/!d; s/:present$//" )' -- "$cur") )
+	    ;;
+	'possible')
+	    COMPREPLY=( $(compgen -W '$( command seq 256 )' -- "$cur") )
+	    ;;
+    esac
+    return 0
+}
+
+have krgcapset &&
+_krgcapset()
+{
+    local cur=$2 prev=$3
+    local options='--help -h --version -v --show -s --force -f --pid -k
+      --effective -e --permitted -p --inheritable-effective -d
+      --inheritable-permitted -i'
+    local caps='+CHANGE_KERRIGHED_CAP +CAN_MIGRATE +DISTANT_FORK +USE_REMOTE_MEMORY
+      +CHECKPOINTABLE +SEE_LOCAL_PROC_STAT -CHANGE_KERRIGHED_CAP -CAN_MIGRATE -DISTANT_FORK
+      -USE_REMOTE_MEMORY -CHECKPOINTABLE -SEE_LOCAL_PROC_STAT'
+
+    COMPREPLY=()
+
+    case "${prev}" in
+	-@(-effective|e|-permitted|p|-inheritable-effective|d|-inheritable-permitted|i))
+	# previous option asks for a capability
+            COMPREPLY=( $(compgen -W "${caps}" -- ${cur}) )
+	    return 0
+	    ;;
+	-@(-pid|k))
+	# previous option asks for a pid
+	    _pids
+	    return 0
+	    ;;
+    esac
+
+    # return one of the possible options
+    COMPREPLY=( $(compgen -W "${options}" -- ${cur}) )
+
+    return 0
+}
+[ -n "${have:-}" ] && complete -F _krgcapset krgcapset
+
+have krgadm &&
+_krgadm()
+{
+    local cur=$2 prev=$3
+
+    local modes='cluster nodes'
+    local cluster_actions='status poweroff reboot'
+    local nodes_actions='status add del'
+    local nodes_status_opts='-n --nodes -a --all'
+    local nodes_opts='-n --nodes -c --count -t --total -a --all'
+    local options='--help -h --version'
+
+    COMPREPLY=()
+
+    case "${prev}" in
+	cluster)
+	    COMPREPLY=( $(compgen -W "${cluster_actions}" -- ${cur}) )
+	    return 0
+	    ;;
+	nodes)
+            COMPREPLY=( $(compgen -W "${nodes_actions}" -- ${cur}) )
+	    return 0
+	    ;;
+	add|del)
+	    COMPREPLY=( $(compgen -W "${nodes_opts}" -- ${cur}) )
+	    return 0
+	    ;;
+	status)
+	    if [ "${COMP_WORDS[COMP_CWORD-2]}" = "nodes" ]; then
+		COMPREPLY=( $(compgen -W "${nodes_status_opts}" -- ${cur}) )
+	    fi
+	    return 0
+	    ;;
+	-n|--nodes)
+	    case "${COMP_WORDS[COMP_CWORD-2]}" in
+		"add"|"status")
+		    _nodes 'possible'
+		    return 0
+		    ;;
+		"del")
+		    _nodes 'online'
+		    return 0
+		    ;;
+	    esac
+	    ;;
+	*)
+	    case "${COMP_WORDS[1]}" in
+		cluster)
+		    return 0
+		    ;;
+		nodes)
+		    return 0
+		    ;;
+		*)
+		    COMPREPLY=( $(compgen -W "${options} ${modes}" -- ${cur} ) )
+	    esac
+	    ;;
+    esac
+
+    return 0
+}
+[ -n "${have:-}" ] && complete -F _krgadm krgadm
+
+have checkpoint &&
+_checkpoint()
+{
+    local cur=$2 prev=$3
+    local options='-h --help -v --version -a --from-appid -f --freeze -u --unfreeze -c --ckpt-only -k --kill -i --ignore-unsupported-files -d --description'
+    COMPREPLY=()
+
+    case "${prev}" in
+	-u|--unfreeze)
+	    _signals
+	    return 0
+	    ;;
+	-k|--kill)
+	    _signals
+	    return 0
+	    ;;
+	*)
+	    return 0
+	    _pids
+	    ;;
+    esac
+
+    COMPREPLY=( $(compgen -W "${options}" -- ${cur}) )
+    return 0
+}
+[ -n "${have:-}" ] && complete -F _checkpoint checkpoint
+
+have migrate &&
+_migrate()
+{
+    local cur=$2 prev=$3
+    local options='-h --help -v --version'
+    COMPREPLY=()
+
+    case "${prev}" in
+	-h|--help|-v|--version)
+	    return 0
+	    ;;
+	@(1|2|3|4|5|6|7|8|9)*)
+            _nodes 'online'
+	    return 0
+	    ;;
+	*)
+	    _pids
+	    return 0
+	    ;;
+    esac
+
+    COMPREPLY=( $(compgen -W "${options}" -- ${cur}) )
+    return 0
+}
+[ -n "${have:-}" ] && complete -F _migrate migrate
