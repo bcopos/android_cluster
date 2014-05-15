@@ -1,6 +1,16 @@
 linux 2.6.29 kerrighed
 ======================
 
+INSTRUCTIONS:
+
+1) inside kerrighed dir: ./configure --with-kernel-config-file=/path/to/defconfig
+2) make
+
+NOTES:
+- kerrighed will download linux-2.6.29.tar.bz -- this is OK
+- however, make sure that during the configuration process, it does NOT unzip the linux source it just downloaded and instead uses the one already in the patches directory
+- the linux-2.6.29 in the kerrighed/patches directory is a symlink to the linux-2.6.29 in the root directory of the repo
+
 
 Failed patches
 * include
