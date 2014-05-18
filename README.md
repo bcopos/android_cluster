@@ -3,8 +3,9 @@ linux 2.6.29 kerrighed
 
 INSTRUCTIONS:
 
-1. inside kerrighed dir: ./configure --with-kernel-config-file=/path/to/defconfig
-2. make
+1. cp -R linux-2.6.29 kerrighed/patches/.
+2. inside kerrighed dir: ./configure --with-kernel-config-file=/path/to/defconfig
+3. make
 
 
 NOTES:
