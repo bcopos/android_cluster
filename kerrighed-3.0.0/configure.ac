@@ -49,7 +49,7 @@ AM_CONDITIONAL([USER_INSTALL], [test "$enable_user_install" = "yes"])
 ###
 ### BEGIN KERNEL CHECK
 ###
-vanilla_linux_version=2.6.30
+vanilla_linux_version=2.6.29
 AC_SUBST([vanilla_linux_version])
 
 case $target_cpu in
