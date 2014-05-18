@@ -11,10 +11,11 @@
 
 #include "rpc_internal.h"
 
-static void rpc_remove(krgnodemask_t * vector)
-{
-	printk("Have to send all the tx_queue before stopping the node\n");
-};
+// commented function out to get rid of compile time error
+//static void rpc_remove(krgnodemask_t * vector)
+//{
+//	printk("Have to send all the tx_queue before stopping the node\n");
+//};
 
 
 /**
