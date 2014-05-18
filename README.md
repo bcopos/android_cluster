@@ -5,7 +5,7 @@ INSTRUCTIONS:
 
 1. cp -R linux-2.6.29 kerrighed/patches/.
 2. inside kerrighed dir: ./configure --with-kernel-config-file=/path/to/defconfig
-3. make
+3. make (use gcc-4.4)
 
 
 NOTES:
