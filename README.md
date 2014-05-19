@@ -13,7 +13,7 @@ Links:
 
 INSTRUCTIONS FOR QEMU:
 
-1. qemu-system-x86_64 -kernel [path]/[to]/bzImage -initrd [path]/[to]/rootfs.img "root=/dev/ram" -nographic -append "console=ttyS0,115200" -vga vmware
+1. qemu-system-x86_64 -kernel [path]/[to]/bzImage -initrd [path]/[to]/rootfs.img "root=/dev/ram" -nographic -append "root=/dev/ram console=ttyS0,115200" -vga vmware
 
 Links:
 1. http://www.tldp.org/HOWTO/Bootdisk-HOWTO/buildroot.html
