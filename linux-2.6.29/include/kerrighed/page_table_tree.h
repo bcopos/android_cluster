@@ -8,6 +8,7 @@
 #define __PAGE_TABLE_TREE__
 
 #include <kddm/kddm_types.h>
+#include <linux/pagemap.h>
 
 /*--------------------------------------------------------------------------*
  *                                                                          *
@@ -50,7 +51,8 @@ static inline swp_entry_t get_swap_entry_from_page(struct page *page)
 
 static inline void wait_lock_page (struct page *page)
 {
-	while (TestSetPageLocked(page))
+	//while (TestSetPageLocked(page))
+	while (trylock_page(page))
 		cpu_relax();
 }
 

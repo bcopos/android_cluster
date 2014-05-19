@@ -145,7 +145,8 @@ static void update_dynamic_node_info_worker(struct work_struct *work)
 				      * sysctl_overcommit_ratio / 100) +
 		                     total_swap_pages;
 
-	dynamic_node_info->commited = percpu_counter_read_positive(&vm_committed_as);
+//	dynamic_node_info->commited = percpu_counter_read_positive(&vm_committed_as);
+	dynamic_node_info->commited = atomic_long_read(&vm_committed_space);
 
 	get_vmalloc_info(&dynamic_node_info->vmi);
 	dynamic_node_info->vmalloc_total = VMALLOC_TOTAL;

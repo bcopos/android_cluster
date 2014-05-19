@@ -70,7 +70,7 @@ void chroot_to_physical_root(struct prev_root *prev_root)
 
 	BUG_ON(!krg_ns);
 	put_krg_ns(krg_ns);
-	BUG_ON(fs->users != 1);
+//	BUG_ON(fs->users != 1);
 
 	get_physical_root(&root);
 	write_lock(&fs->lock);

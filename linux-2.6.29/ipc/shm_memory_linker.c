@@ -117,7 +117,7 @@ int shm_memory_invalidate_page (struct kddm_obj * objEntry,
 		struct page *page = (struct page *) objEntry->object;
 
 		BUG_ON (page->mapping == NULL);
-		BUG_ON (TestSetPageLocked(page));
+		BUG_ON (trylock_page(page));
 
 		SetPageToInvalidate(page);
 		res = try_to_unmap(page, 0);

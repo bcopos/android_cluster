@@ -1141,7 +1141,8 @@ retry:
 int __krg_group_send_sig_info(int sig, struct siginfo *info,
 			      struct task_struct *p)
 {
-	return __send_signal(sig, info, p, 1, 0);
+//	return __send_signal(sig, info, p, 1, 0);
+	return send_signal(sig, info, p, 1);
 }
 
 /* Caller guarantees that p remains hashed. */

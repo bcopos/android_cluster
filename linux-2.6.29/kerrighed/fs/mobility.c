@@ -1366,7 +1366,7 @@ static int cr_link_to_fs_struct(struct epm_action *action,
 	}
 
 	/* the task is not yet hashed, no need to lock */
-	fs->users++;
+//	fs->users++;
 	tsk->fs = fs;
 err:
 	return r;
@@ -1411,8 +1411,9 @@ int import_fs_struct (struct epm_action *action,
 	if (fs == NULL)
 		goto exit;
 
-	fs->users = 1;
-	fs->in_exec = 0;
+//	fs->users = 1;
+//	fs->in_exec = 0;
+	atomic_inc(&fs->count);
 	rwlock_init (&fs->lock);
 
 	/* Import the umask value */

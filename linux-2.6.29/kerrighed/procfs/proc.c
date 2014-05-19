@@ -867,8 +867,8 @@ static int show_uptime(struct seq_file *p, void *v)
 	unsigned long long idle = 0;
 	unsigned long idle_mod;
 
-	if (!current->nsproxy->krg_ns)
-		return uptime_proc_show(p, v);
+//	if (!current->nsproxy->krg_ns)
+//		return uptime_proc_show(p, v);
 
 	nodes = get_proc_nodes_vector(nodeid);
 

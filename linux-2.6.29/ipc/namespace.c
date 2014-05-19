@@ -47,6 +47,7 @@ exit:
 static struct ipc_namespace *clone_ipc_ns(struct ipc_namespace *old_ns)
 {
 	struct ipc_namespace *ns;
+	int err;
 
 	ns = kmalloc(sizeof(struct ipc_namespace), GFP_KERNEL);
 	if (ns == NULL)
