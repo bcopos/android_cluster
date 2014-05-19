@@ -1,12 +1,29 @@
 linux 2.6.29 kerrighed
 ======================
 
-INSTRUCTIONS:
+INSTRUCTIONS FOR ROOTFS:
+
+1. Download BusyBox src
+2. make allyesconfig (or allnoconfig or some config...)
+3. make install
+4. find . | cpio -o --format=newc > rootfs.img
+
+Links:
+1. http://imvoid.wordpress.com/2013/05/25/building-busybox-to-get-root-file-system-to-linux-kernel/
+
+INSTRUCTIONS FOR QEMU:
+
+1. qemu-system-x86_64 -kernel [path]/[to]/bzImage -initrd [path]/[to]/rootfs.img "root=/dev/ram" -nographic -append "console=ttyS0,115200" -vga vmware
+
+Links:
+1. http://www.tldp.org/HOWTO/Bootdisk-HOWTO/buildroot.html
+
+INSTRUCTIONS FOR BUILDING:
 
 1. cp -R linux-2.6.29 kerrighed/patches/.
-2. inside kerrighed dir: ./configure --with-kernel-config-file=/path/to/defconfig
-3. make (use gcc-4.4)
-
+2. inside kerrighed dir: ./configure i386_defconfig or x86_64_defconfig(?)
+3. make kernel(use gcc-4.4)
+4. bzImage file will be in kerrighed/kernel/arch/x86/boot/
 
 NOTES:
 - use gcc-4.4
