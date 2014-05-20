@@ -1,7 +1,15 @@
 linux 2.6.29 kerrighed
 ======================
 
+NETWORK IN QEMU:
+
+1. ifconfig eth0 up
+2. udhcpc
+3. check ifconfig or try ping-ing
+
+
 INSTRUCTIONS TO QUICKLY BOOT IMAGE:
+
 1. install qemu
 2. edit path in run.sh if bash shell is not located at /bin/bash
 3. ./run.sh
