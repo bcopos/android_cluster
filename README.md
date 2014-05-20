@@ -27,7 +27,9 @@ Links:
 
 INSTRUCTIONS FOR QEMU:
 
-1. qemu-system-x86_64 -kernel [path]/[to]/bzImage -initrd [path]/[to]/rootfs.img -nographic -append "root=/dev/ram console=ttyS0,115200" -vga vmware
+- qemu-system-x86_64 -kernel [path]/[to]/bzImage -initrd [path]/[to]/rootfs.img -append "root=/dev/ram"
+	OR
+- qemu-system-x86_64 -kernel [path]/[to]/bzImage -initrd [path]/[to]/rootfs.img -nographic -append "root=/dev/ram console=ttyS0,115200" -vga vmware
 
 Links:
 1. http://www.tldp.org/HOWTO/Bootdisk-HOWTO/buildroot.html
@@ -116,7 +118,7 @@ Failed patches
     * ~~fs_stat.c~~
         * function is replaced in 2.6.30, but contents are similar, modified 29 to be similar to 30 and applied patch, seems OK
 * ipc
-    * ipc_Makefile
+    * ~~ipc_Makefile~~
     * ~~ipc_namespace.c~~
     * ~~ipc_util.h~~
 * Makefile
