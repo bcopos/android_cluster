@@ -1,6 +1,12 @@
 linux 2.6.29 kerrighed
 ======================
 
+INSTRUCTIONS TO QUICKLY BOOT IMAGE:
+1. install qemu
+2. edit path in run.sh if bash shell is not located at /bin/bash
+3. ./run.sh
+
+
 INSTRUCTIONS FOR ROOTFS:
 
 1. Download BusyBox src
