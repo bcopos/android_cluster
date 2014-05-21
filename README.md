@@ -25,7 +25,7 @@ INSTRUCTIONS FOR ROOTFS:
 Hints:
 - run menuconfig to add utilities and libraries (openssh, openssl, etc)
 - if needed, use glibc toolchain (toolchain options)
-- populate dev (tty, tty1, null, urandom"
+- populate dev (tty, tty1, null, urandom)
 - edit etc/network/interfaces to have internet access 
 - mount rootfs image and install kerrighed there (prefix=/path/to/rootfs/mount)
 - copy /lib/lsb/init-functions from ubuntu vm or somewhere... kerrighed-host uses it
@@ -39,7 +39,14 @@ INSTRUCTIONS FOR QEMU:
 Links:
 1. http://www.tldp.org/HOWTO/Bootdisk-HOWTO/buildroot.html
 
-INSTRUCTIONS FOR BUILDING:
+INSTRUCTION FOR BUILDING KERRIGHED LIBS AND APPS:
+1. inside kerrighed dir: ./configure -disable-kernel
+2. make distclean
+3. ./autogen.sh
+4. ./configure --disable-kernel --prefix=/path/to/
+5. make install
+
+INSTRUCTIONS FOR BUILDING KERNEL:
 
 1. cp -R linux-2.6.29 kerrighed/patches/.
 2. inside kerrighed dir: ./configure i386_defconfig or x86_64_defconfig(?)
