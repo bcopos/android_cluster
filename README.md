@@ -17,13 +17,18 @@ INSTRUCTIONS TO QUICKLY BOOT IMAGE:
 
 INSTRUCTIONS FOR ROOTFS:
 
-1. Download BusyBox src
-2. make allyesconfig (or allnoconfig or some config...)
-3. make install
-4. find . | cpio -o --format=newc > rootfs.img
+1. Download Buildroot src
+2. make help
+3. choose an option from two and make
+4. rootfs img will be in output/images
 
-Links:
-1. http://imvoid.wordpress.com/2013/05/25/building-busybox-to-get-root-file-system-to-linux-kernel/
+Hints:
+- run menuconfig to add utilities and libraries (openssh, openssl, etc)
+- if needed, use glibc toolchain (toolchain options)
+- populate dev (tty, tty1, null, urandom"
+- edit etc/network/interfaces to have internet access 
+- mount rootfs image and install kerrighed there (prefix=/path/to/rootfs/mount)
+- copy /lib/lsb/init-functions from ubuntu vm or somewhere... kerrighed-host uses it
 
 INSTRUCTIONS FOR QEMU:
 
