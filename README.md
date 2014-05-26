@@ -67,7 +67,8 @@ NOTES:
 - however, make sure that during the configuration process, it does NOT unzip the linux source it just downloaded and instead uses the one already in the patches directory
 - the linux-2.6.29 in the kerrighed/patches directory is a symlink to the linux-2.6.29 in the root directory of the repo
 
-
+linux 2.6.29 + kerrighed porting
+=================
 Failed patches
 * include
     * ~~include_linux_ipc_namespace_.h~~
