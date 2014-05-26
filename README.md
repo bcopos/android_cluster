@@ -1,6 +1,19 @@
 linux 2.6.29 kerrighed
 ======================
 
+INSTRUCTIONS FOR SETTING UP KERRIGHED NODES:
+
+1. create tap interfaces: `openvpn –mktun –dev tap0` and `openvpn –mktun –dev tap1`
+2. `brctl addbr [name]`
+3. `brctl addif tap0`
+4. `brctl addif tap1`
+5. start two qemu emulators running patched linux and rootfs, same session_id, *different* node_id, *different* tap interfaces, *different* macaddr
+`qemu-system-x86_64 -kernel Downloads/good/bzImage -initrd Downloads/rootfs.ext2 -append "root=/dev/ram session_id=1 node_id=1 ramdisk_size=128000" -net nic,macaddr=00:11:22:33:44:55 -net tap,ifname=tap0,script=no,downscript=no`
+6. inside one node, ssh into kerrighed-container: `ssh user@localhost -p 2222`
+7. inside the kerrighed-container: `krgadm nodes add -a`
+8. check proc/cpuinfo: `cat /proc/cpuinfo`
+
+
 ANDROID_X86 donut (1.6)
 
 1. get `repo` tool
