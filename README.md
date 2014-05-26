@@ -57,8 +57,10 @@ INSTRUCTION FOR BUILDING KERRIGHED LIBS AND APPS:
 INSTRUCTIONS FOR BUILDING KERNEL:
 
 1. `cp -R linux-2.6.29 kerrighed/patches/.`
-2. inside kerrighed dir: `./configure i386_defconfig` or x86_64_defconfig(?)
-3. `make kernel`(use gcc-4.4)
+2. inside kerrighed dir: `./configure`
+3. `cd _kernel`
+4. `make x86_64_defconfig`
+5. `make`
 4. bzImage file will be in kerrighed/kernel/arch/x86/boot/
 
 NOTES:
