@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
 	close_stdioe(close_stdbuffers);
 
-	pid = (pid_t)syscall(SYS_clone, SIGCHLD | CLONE_FILES, NULL);
+	pid = (pid_t)syscall(SYS_clone, SIGCHLD | 0x00000400, NULL);
 	if (pid == -1) {
 		perror("clone");
 		exit(EXIT_FAILURE);

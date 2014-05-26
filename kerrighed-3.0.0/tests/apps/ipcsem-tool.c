@@ -191,7 +191,7 @@ int test_loop(int semid, int undo)
 
 	/* Now forking, the child will lock while the parent will unlock */
 
-	pid = (pid_t)syscall(SYS_clone, SIGCHLD | CLONE_SYSVSEM, NULL);
+	pid = (pid_t)syscall(SYS_clone, SIGCHLD | 0x00040000, NULL);
 	if (pid == -1) {
 		perror("clone");
 		exit(EXIT_FAILURE);

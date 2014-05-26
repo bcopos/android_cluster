@@ -7,5 +7,5 @@
       Mostly inspired by RefDB driver
        -->
 
-  <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl"/>
+  <!--<xsl:import href="http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl"/>-->
 </xsl:stylesheet>
