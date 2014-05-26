@@ -4,7 +4,7 @@ linux 2.6.29 kerrighed
 ANDROID_X86 donut (1.6)
 
 1. get `repo` tool
-2. `repo init -u git://git.android-x86.org/platform/manifest.git -b donut-x86` (other links don't work)
+2. `repo init -u git://android-x86.git.sf.net/gitroot/android-x86/manifest.git -b donut-x86` (other links don't work)
 3. `repo sync`
 
 NETWORK IN QEMU:
