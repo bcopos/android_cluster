@@ -167,6 +167,7 @@ print_cfs_rq(struct seq_file *m, int cpu, struct cfs_rq *cfs_rq)
 
 extern unsigned long long time_sync_thresh;
 
+
 /*
  * Task state bitmask. NOTE! These bits are also
  * encoded in fs/proc/array.c: get_task_state().
@@ -2123,6 +2124,11 @@ static inline int thread_group_empty(struct task_struct *p)
 
 #define delay_group_leader(p) \
 		(thread_group_leader(p) && !thread_group_empty(p))
+
+static inline int task_detached(struct task_struct *p)
+{
+	return p->exit_signal == -1;
+}
 
 /*
  * Protects ->fs, ->files, ->mm, ->group_info, ->comm, keyring

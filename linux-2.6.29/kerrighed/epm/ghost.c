@@ -1426,7 +1426,7 @@ static struct task_struct *import_task(struct epm_action *action,
 	task->notifier_mask = NULL;
 	spin_lock_init(&task->alloc_lock);
 #ifdef CONFIG_GENERIC_HARDIRQS
-	BUG_ON(task->irqaction);
+//	BUG_ON(task->irqaction);
 #endif
 	spin_lock_init(&task->pi_lock);
 #ifdef CONFIG_RT_MUTEXES

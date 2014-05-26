@@ -97,8 +97,8 @@ static int migration_implemented(struct task_struct *task)
 		goto out_unlock;
 
 	/* No task sharing its fs_struct */
-	if (!task->fs || task->fs->users > 1)
-		goto out_unlock;
+//	if (!task->fs || task->fs->users > 1)
+//		goto out_unlock;
 
 	ret = 1;
 out_unlock:

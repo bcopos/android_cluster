@@ -7,7 +7,7 @@
 
 #include <linux/sched.h>
 #include <linux/nsproxy.h>
-#include <linux/ima.h>
+//#include <linux/ima.h>
 #include <linux/ipc.h>
 #include <linux/ipc_namespace.h>
 #include <linux/file.h>
@@ -124,7 +124,7 @@ struct file *reopen_shm_file_entry_from_krg_desc(struct task_struct *task,
 		err = -ENOMEM;
 		goto out_free;
 	}
-	ima_shm_check(file);
+//	ima_shm_check(file);
 
 	file->private_data = sfd;
 	file->f_mapping = shp->shm_file->f_mapping;

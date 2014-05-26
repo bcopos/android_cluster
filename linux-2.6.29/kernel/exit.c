@@ -82,10 +82,6 @@ static
 #endif
 void exit_mm(struct task_struct * tsk);
 
-static inline int task_detached(struct task_struct *p)
-{
-	return p->exit_signal == -1;
-}
 
 static void __unhash_process(struct task_struct *p)
 {
