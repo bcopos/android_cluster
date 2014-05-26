@@ -1,10 +1,16 @@
 linux 2.6.29 kerrighed
 ======================
 
+ANDROID_X86 donut (1.6)
+
+1. get `repo` tool
+2. `repo init -u git://git.android-x86.org/platform/manifest.git -b donut-x86` (other links don't work)
+3. `repo sync`
+
 NETWORK IN QEMU:
 
-1. ifconfig eth0 up
-2. udhcpc
+1. `ifconfig eth0 up`
+2. `udhcpc`
 3. check ifconfig or try ping-ing
 
 
@@ -12,7 +18,7 @@ INSTRUCTIONS TO QUICKLY BOOT IMAGE:
 
 1. install qemu
 2. edit path in run.sh if bash shell is not located at /bin/bash
-3. ./run.sh
+3. `./run.sh`
 
 
 INSTRUCTIONS FOR ROOTFS:
@@ -37,20 +43,22 @@ INSTRUCTIONS FOR QEMU:
 - qemu-system-x86_64 -kernel [path]/[to]/bzImage -initrd [path]/[to]/rootfs.img -nographic -append "root=/dev/ram console=ttyS0,115200" -vga vmware
 
 Links:
+
 1. http://www.tldp.org/HOWTO/Bootdisk-HOWTO/buildroot.html
 
 INSTRUCTION FOR BUILDING KERRIGHED LIBS AND APPS:
-1. inside kerrighed dir: ./configure -disable-kernel
-2. make distclean
-3. ./autogen.sh
-4. ./configure --disable-kernel --prefix=/path/to/
-5. make install
+
+1. inside kerrighed dir: `./configure -disable-kernel`
+2. `make distclean`
+3. `./autogen.sh`
+4. `./configure --disable-kernel --prefix=/path/to/`
+5. `make install`
 
 INSTRUCTIONS FOR BUILDING KERNEL:
 
-1. cp -R linux-2.6.29 kerrighed/patches/.
-2. inside kerrighed dir: ./configure i386_defconfig or x86_64_defconfig(?)
-3. make kernel(use gcc-4.4)
+1. `cp -R linux-2.6.29 kerrighed/patches/.`
+2. inside kerrighed dir: `./configure i386_defconfig` or x86_64_defconfig(?)
+3. `make kernel`(use gcc-4.4)
 4. bzImage file will be in kerrighed/kernel/arch/x86/boot/
 
 NOTES:
