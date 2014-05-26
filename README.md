@@ -19,6 +19,7 @@ ANDROID_X86 donut (1.6)
 1. get `repo` tool
 2. `repo init -u git://android-x86.git.sf.net/gitroot/android-x86/manifest.git -b donut-x86` (other links don't work)
 3. `repo sync`
+4. To patch: patch p1 -R < android.patch
 
 NETWORK IN QEMU:
 
