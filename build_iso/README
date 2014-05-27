@@ -11,10 +11,9 @@ To extract the android iso:
 
     sudo extract.sh androidx86-1.6.iso
 
-This should create two new directories:
+This should create a new directory:
 
-    new_iso.d
-    original_iso.d
+    edit_iso.d
 
 You can then replace the kernel in new_iso.d and repack the iso using:
 
