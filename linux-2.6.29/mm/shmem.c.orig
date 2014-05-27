@@ -161,6 +161,10 @@ static inline struct shmem_sb_info *SHMEM_SB(struct super_block *sb)
 	return sb->s_fs_info;
 }
 
+#ifdef CONFIG_KRG_EPM
+#include <kerrighed/krgsyms.h>
+#endif
+
 /*
  * shmem_file_setup pre-accounts the whole fixed size of a VM object,
  * for shared memory and for shared anonymous (/dev/zero) mappings
@@ -199,7 +203,10 @@ static inline void shmem_unacct_blocks(unsigned long flags, long pages)
 
 static const struct super_operations shmem_ops;
 static const struct address_space_operations shmem_aops;
-static const struct file_operations shmem_file_operations;
+#ifndef CONFIG_KRG_EPM
+static
+#endif
+const struct file_operations shmem_file_operations;
 static const struct inode_operations shmem_inode_operations;
 static const struct inode_operations shmem_dir_inode_operations;
 static const struct inode_operations shmem_special_inode_operations;
@@ -2408,7 +2415,10 @@ static const struct address_space_operations shmem_aops = {
 	.migratepage	= migrate_page,
 };
 
-static const struct file_operations shmem_file_operations = {
+#ifndef CONFIG_KRG_EPM
+static
+#endif
+const struct file_operations shmem_file_operations = {
 	.mmap		= shmem_mmap,
 #ifdef CONFIG_TMPFS
 	.llseek		= generic_file_llseek,
@@ -2522,6 +2532,14 @@ static int __init init_tmpfs(void)
 		goto out2;
 	}
 
+#ifdef CONFIG_KRG_EPM
+	error = krgsyms_register(KRGSYMS_VM_OPS_SHMEM, &shmem_vm_ops);
+	if (error) {
+		printk(KERN_ERR "Could not register shmem_vm_ops\n");
+		goto out1_1;
+	}
+#endif
+
 	shm_mnt = vfs_kern_mount(&tmpfs_fs_type, MS_NOUSER,
 				tmpfs_fs_type.name, NULL);
 	if (IS_ERR(shm_mnt)) {
@@ -2532,6 +2550,10 @@ static int __init init_tmpfs(void)
 	return 0;
 
 out1:
+#ifdef CONFIG_KRG_EPM
+	krgsyms_unregister(KRGSYMS_VM_OPS_SHMEM);
+out1_1:
+#endif
 	unregister_filesystem(&tmpfs_fs_type);
 out2:
 	destroy_inodecache();

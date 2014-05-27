@@ -276,7 +276,7 @@ int ptrace_attach(struct task_struct *task)
 	/* Protect exec's credential calculations against our interference;
 	 * SUID, SGID and LSM creds get determined differently under ptrace.
 	 */
-	retval = mutex_lock_interruptible(&current->cred_exec_mutex);
+	retval = mutex_lock_interruptible(&task->cred_exec_mutex);
 	if (retval  < 0)
 		goto out;
 #ifdef CONFIG_KRG_EPM
@@ -342,7 +342,7 @@ bad:
 		krg_children_unlock(parent_children_obj);
 	up_read(&kerrighed_init_sem);
 #endif /* CONFIG_KRG_EPM */
-	mutex_unlock(&current->cred_exec_mutex);
+	mutex_unlock(&task->cred_exec_mutex);
 out:
 	return retval;
 
