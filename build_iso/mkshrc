@@ -1,0 +1,53 @@
+# Copyright (c) 2010, 2011
+#	Thorsten Glaser <t.glaser@tarent.de>
+# This file is provided under the same terms as mksh.
+#-
+# Minimal /system/etc/mkshrc for Android
+
+: ${TERM:=vt100} ${HOME:=/data} ${MKSH:=/system/bin/sh} ${HOSTNAME:=$(getprop ro.product.device)}
+: ${SHELL:=$MKSH} ${USER:=$(typeset x=$(id); x=${x#*\(}; print -r -- ${x%%\)*})}
+if (( USER_ID )); then PS1='$'; else PS1='#'; fi
+function precmd {
+	typeset e=$?
+
+	(( e )) && print -n "$e|"
+}
+PS1='$(precmd)$USER@$HOSTNAME:${PWD:-?} '"$PS1 "
+export HOME HOSTNAME MKSH SHELL TERM USER
+alias l='ls'
+alias la='l -a'
+alias ll='l -l'
+alias lo='l -a -l'
+
+function more {
+	typeset dummy line llen curlin=0
+
+	cat "$@" | while IFS= read -r line; do
+		llen=${%line}
+		(( llen == -1 )) && llen=${#line}
+		(( llen = llen ? (llen + COLUMNS - 1) / COLUMNS : 1 ))
+		if (( (curlin += llen) >= LINES )); then
+			print -n -- '\033[7m--more--\033[0m'
+			read -u1 dummy
+			[[ $dummy = [Qq]* ]] && return 0
+			curlin=$llen
+		fi
+		print -r -- "$line"
+	done
+}
+
+for p in ~/.bin; do
+	[[ -d $p/. ]] || continue
+	[[ :$PATH: = *:$p:* ]] || PATH=$p:$PATH
+done
+
+unset p
+
+echo "Setting network"
+dhcpcd eth0
+route add default gw 10.1.0.2 dev eth0
+setprop net.dns1 10.1.0.41
+setprop net.dns2 8.8.8.8
+echo ""
+
+: place customisations above this line

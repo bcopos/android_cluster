@@ -1,0 +1,21 @@
+You will need to install a couple tools in order to repack the iso:
+
+    sudo apt-get install squashfs-tools
+    sudo apt-get install genisoimage
+
+The genisoimage was originally named mkisofs, so to ensure compatability with this tool:
+
+    sudo ln -s /usr/bin/genisoimage /usr/bin/mkisofs
+
+To extract the android iso:
+
+    sudo extract.sh androidx86-1.6.iso
+
+This should create two new directories:
+
+    new_iso.d
+    original_iso.d
+
+You can then replace the kernel in new_iso.d and repack the iso using:
+
+    sudo ./create_new.sh <name new iso> 
