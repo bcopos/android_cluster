@@ -990,10 +990,7 @@ struct file *dentry_open(struct dentry *dentry, struct vfsmount *mnt, int flags,
 }
 EXPORT_SYMBOL(dentry_open);
 
-#ifndef CONFIG_KRG_FAF
-static
-#endif
-void __put_unused_fd(struct files_struct *files, unsigned int fd)
+static void __put_unused_fd(struct files_struct *files, unsigned int fd)
 {
 	struct fdtable *fdt = files_fdtable(files);
 	__FD_CLR(fd, fdt->open_fds);
