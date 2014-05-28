@@ -5,7 +5,7 @@
 #include <linux/idr.h>
 #include <linux/rwsem.h>
 #include <linux/notifier.h>
-
+#include <linux/sched.h>
 /*
  * ipc namespace events
  */
