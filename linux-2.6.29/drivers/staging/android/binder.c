@@ -31,6 +31,7 @@
 #include <linux/sched.h>
 #include <linux/uaccess.h>
 #include <linux/vmalloc.h>
+#include <linux/pid_namespace.h>
 #include "binder.h"
 
 static DEFINE_MUTEX(binder_lock);
