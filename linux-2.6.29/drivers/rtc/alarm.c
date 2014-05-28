@@ -14,6 +14,7 @@
  */
 
 #ifndef __i386__
+#else
 #include <asm/mach/time.h>
 #endif
 #include <linux/android_alarm.h>
@@ -333,6 +334,7 @@ static void alarm_triggered_func(void *p)
 * Return a delta between the system time and the RTC time, such
 * that system time can be restored later with restore_time_delta()
 */
+#else
 static void save_time_delta(struct timespec *delta, struct timespec *rtc)
 {
         set_normalized_timespec(delta,
