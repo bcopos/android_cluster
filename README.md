@@ -56,6 +56,20 @@ INSTRUCTIONS FOR QEMU:
 	OR
 - qemu-system-x86_64 -kernel [path]/[to]/bzImage -initrd [path]/[to]/rootfs.img -nographic -append "root=/dev/ram console=ttyS0,115200" -vga vmware
 
+INSTRUCTIONS FOR SAVING VM IN QEMU:
+- create QEMU disk image: `qemu-img create -f qcow2 test.qcow2 1G`
+- add the disk image to run.sh: `-hda test.qcow2`
+- `./run.sh`
+- enter 'ctrl'+'alt'+'shift'+'2' to enter QEMU monitor mode
+- `savevm newvm` -- your VM is now saved in test.qcow2
+- enter 'ctrl'+'alt'+'shift'+'1' to exit QEMU monitor mode
+
+INSTRUCTIONS FOR LOADING VM IN QEMU:
+- add the existing disk image to the run.sh script: `-hda test.qcow2`
+- `./run.sh`
+- enter QEMU monitor mode
+- `loadvm newvm`
+
 Links:
 
 1. http://www.tldp.org/HOWTO/Bootdisk-HOWTO/buildroot.html
