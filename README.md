@@ -1,6 +1,11 @@
 linux 2.6.29 kerrighed
 ======================
 
+START KERRIGHED ON KRG ANDROID KERNEL:
+
+1. `/etc/init.d/kerrighed-host start`
+2. `krgboot -imp -- /sbin/krginit-helper` (don't run krgboot_helper, the -u flag causes to crash)
+
 INSTRUCTIONS FOR SETTING UP KERRIGHED NODES:
 
 1. create tap interfaces: `openvpn –mktun –dev tap0` and `openvpn –mktun –dev tap1`
