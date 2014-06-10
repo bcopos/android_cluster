@@ -1,6 +1,8 @@
 ANDROID KERRIGHED
 =================
-- Android kernel with Kerrighed support, based on linux 2.6.29 and kerrighed 3.0.0, rootfs built using buildroot
+
+Android kernel with Kerrighed support, based on linux 2.6.29 and kerrighed 3.0.0, rootfs built using buildroot.
+Check `git tag` for versions. Tag `linux2.6.29Ker` has source code necessary to build Linux kernel version 2.6.29 with Kerrighed support. Tag `linux2.6.29KerAndroid` has the same with Android support additional.
 
 
 NOTES:
