@@ -1,11 +1,6 @@
 ANDROID KERRIGHED
 =================
-- Android kernel with Kerrighed support, based on linux 2.6.29 and kerrighed 3.0.0
-- rootfs built using buildroot
-
-
-
-
+- Android kernel with Kerrighed support, based on linux 2.6.29 and kerrighed 3.0.0, rootfs built using buildroot
 
 
 NOTES:
