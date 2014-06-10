@@ -3,6 +3,11 @@ ANDROID KERRIGHED
 - Android kernel with Kerrighed support, based on linux 2.6.29 and kerrighed 3.0.0
 - rootfs built using buildroot
 
+
+
+
+
+
 NOTES:
 - use gcc-4.4
 - kerrighed will download linux-2.6.29.tar.bz -- this is OK
