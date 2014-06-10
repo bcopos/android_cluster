@@ -3,8 +3,6 @@ linux 2.6.29 kerrighed
 
 START KERRIGHED ON KRG ANDROID KERNEL:
 
-1. `/etc/init.d/kerrighed-host start`
-2. `krgboot -imp -- /sbin/krginit-helper` (don't run krgboot_helper, the -u flag causes to crash)
 
 INSTRUCTIONS FOR SETTING UP KERRIGHED NODES:
 
@@ -13,11 +11,15 @@ INSTRUCTIONS FOR SETTING UP KERRIGHED NODES:
 3. `brctl addif tap0`
 4. `brctl addif tap1`
 5. setup tap0, tap1 to have some IP addr (192.168.1.1/2.1)
-5. start two qemu emulators running patched linux and rootfs, same session_id, *different* node_id, *different* tap interfaces, *different* macaddr
+6. start two qemu emulators running patched linux and rootfs, same session_id, *different* node_id, *different* tap interfaces, *different* macaddr
 `qemu-system-x86_64 -kernel Downloads/good/bzImage -initrd Downloads/rootfs.ext2 -append "root=/dev/ram session_id=1 node_id=1 ramdisk_size=128000" -net nic,model=e1000,macaddr=00:11:22:33:44:55 -net tap,ifname=tap0,script=no,downscript=no`
-6. inside one node, ssh into kerrighed-container: `ssh user@localhost -p 2222`
-7. inside the kerrighed-container: `krgadm nodes add -a`
-8. check proc/cpuinfo: `cat /proc/cpuinfo`
+== ON ANDROID KERRIGHED KERNEL ONLY ===
+7. `/etc/init.d/kerrighed-host start`
+8. `krgboot -imp -- /sbin/krginit-helper` (don't run krgboot_helper, the -u flag causes to crash)
+==
+9. inside one node, ssh into kerrighed-container: `ssh user@localhost -p 2222`
+10. inside the kerrighed-container: `krgadm nodes add -a`
+11. check proc/cpuinfo: `cat /proc/cpuinfo`
 
 
 ANDROID_X86 donut (1.6)
@@ -103,80 +105,3 @@ NOTES:
 - however, make sure that during the configuration process, it does NOT unzip the linux source it just downloaded and instead uses the one already in the patches directory
 - the linux-2.6.29 in the kerrighed/patches directory is a symlink to the linux-2.6.29 in the root directory of the repo
 
-linux 2.6.29 + kerrighed porting
-=================
-Failed patches
-* include
-    * ~~include_linux_ipc_namespace_.h~~
-        * although 3 statments at the top of the patch are missing from 2.6.29, it seems like the hunk is to remove a blank line... seems OK!
-    * ~~include_linux_init_task.h~~
-    * ~~include_linux_magic.h~~
-        * line missing "#define STACK_END_MAGIC 0x57AC6E9D" but may not be important, seems OK
-    * ~~include_linux_sched.h~~
-        * line missing "unsigned in_execve:1" but irrelevant, seems OK
-    * ~~include_linux_tracehook.h~~
-* net
-    * ~~net_tipc_bcast.c~~
-    * ~~net_tipc_bcast.h~~
-        * for bcast.c/h seems like the patch tried to remove files but minor differences got in the way... might be OK
-    * ~~net_tipc_dbg.c~~
-        * patch tries to remove files but minor differences (line 261, printf) it couldn't... seems OK 
-    * ~~net_tipc_node.c~~
-        * same story as above... seems OK
-* mm
-    * ~~mm_vmscan.c~~
-        * minor differences... seems OK
-* kernel
-    * ~~kernel_auditsc.c~~
-        * line missing "include <linux/fs_struct.h>", irrelevant to patch... seems OK
-    * ~~kernel_cgroup.c~~
-        * patch adds code at the end of file, however v30 is very different thant v29, so this MAY NOT WORK
-    * ~~kernel_exit.c~~
-        * minor differences, seems OK
-    * ~~kernel_fork.c~~
-        * some "includes" missing
-    * kernel_pid.c
-    * ~~kernel_ptrace.c~~
-        * last function to be patched (exit_ptrace) doesn't exist... REVISIT!
-    * ~~kernel_sched.c~~
-        * function to be patched (__schedule) doesn't exist but the code is in schedule() instead, applied patches there
-* arch
-    * arch_x86_configs_i386_defconfig
-    * arch_x86_configs_x86_64_defconfig
-    * ~~arch_x86_include_asm_pgtable_types.h~~
-        * code for patch was in pgtable.h instead, applied patches there, seems OK
-    * ~~arch_x86_include_asm_thread_info.h~~
-        * define was missing, seems OK
-    * ~~arch_x86_include_asm_uaccess.h~~
-        * minor differences (errret v30 vs. -EFAULT v29 and others), seems OK 
-    * ~~arch_x86_kernel_cpu_proc.c~~
-        * different function call for cpu_mask, seems OK
-    * ~~arch_x86_kernel_process_32.c~~
-        * line after patch (312-ish) is different, REVISIT THIS
-    * ~~arch_x86_kernel_process.c~~
-        * code for patch was moved from process_32/64, so I applied patch directly there, seems OK
-* fs
-    * ~~fs_binfmt_elf_fdpic.c~~
-        * task_pid_vnr(p->real_parent) (30) vs. task_pid_vnr(p->parent) (29)...
-    * ~~fs_eventpoll.c~~
-        * OK
-    * ~~fs_exec.c~~
-        * import missing (hunk1), 2 lines after comment missing in 29 (hunk2), seems OK
-    * ~~fs_inode.c~~
-        * lines following patch were different, seems OK
-    * ~~fs_nfs_inode.c~~
-        * a conditional statement is missing from 29 but is irrelevant, seems OK
-    * ~~fs_open.c~~
-        * import missing, seems OK
-    * ~~fs_proc_base.c~~
-        * import missing, seems OK
-    * ~~fs_proc_uptime.c~~
-        * uptime_proc_show (30) is the same-ish as uptime_proc_read (29) but function name and params are diff. Patch only changes the function type (from static to not), seems OK
-    * ~~fs_stat.c~~
-        * function is replaced in 2.6.30, but contents are similar, modified 29 to be similar to 30 and applied patch, seems OK
-* ipc
-    * ~~ipc_Makefile~~
-    * ~~ipc_namespace.c~~
-    * ~~ipc_util.h~~
-* Makefile
-	* added "-krg" to EXTRAVERSION variable of Makefile (line 4 or something)
