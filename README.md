@@ -3,6 +3,12 @@ ANDROID KERRIGHED
 - Android kernel with Kerrighed support, based on linux 2.6.29 and kerrighed 3.0.0
 - rootfs built using buildroot
 
+NOTES:
+- use gcc-4.4
+- kerrighed will download linux-2.6.29.tar.bz -- this is OK
+- however, make sure that during the configuration process, it does NOT unzip the linux source it just downloaded and instead uses the one already in the patches directory
+- the linux-2.6.29 in the kerrighed/patches directory is a symlink to the linux-2.6.29 in the root directory of the repo
+
 
 INSTRUCTIONS FOR SETTING UP KERRIGHED NODES:
 --------------------------------------------
@@ -79,9 +85,4 @@ INSTRUCTIONS FOR BUILDING KERNEL:
 5. `make`
 4. bzImage file will be in kerrighed/kernel/arch/x86/boot/
 
-NOTES:
-- use gcc-4.4
-- kerrighed will download linux-2.6.29.tar.bz -- this is OK
-- however, make sure that during the configuration process, it does NOT unzip the linux source it just downloaded and instead uses the one already in the patches directory
-- the linux-2.6.29 in the kerrighed/patches directory is a symlink to the linux-2.6.29 in the root directory of the repo
 
